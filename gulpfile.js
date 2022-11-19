@@ -73,7 +73,7 @@ function startBrowserSync(done) {
 		server: {
 			baseDir: './',
 		},
-		browser: ['chrome'],
+		browser: ['chrome', 'firefox'],
 	});
 	done();
 }
