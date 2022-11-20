@@ -4,15 +4,14 @@ const cssnano = require('cssnano');
 const autoprefixer = require('autoprefixer');
 const postcss = require('gulp-postcss');
 const rename = require('gulp-rename');
+const ts = require('gulp-typescript');
+const tsProject = ts.createProject('tsconfig.json');
+const babel = require('gulp-babel');
 const uglify = require('gulp-uglify');
 const sourcemaps = require('gulp-sourcemaps');
 const clean = require('gulp-clean');
 const browserSync = require('browser-sync').create();
 const reload = browserSync.reload;
-const browserify = require('browserify');
-const source = require('vinyl-source-stream');
-const buffer = require('vinyl-buffer');
-const tsify = require('tsify');
 const fancy_log = require('fancy-log');
 
 const paths = {
@@ -41,21 +40,16 @@ function sassCompiler(done) {
 }
 
 function typeScript(done) {
-	browserify({
-		entries: paths.tsEntry,
-		debug: true,
-	})
-		.plugin(tsify)
-		.transform('babelify', {
-			presets: ['@babel/preset-env'],
-			ignore: [/\/node_modules\//],
-			extensions: ['.ts'],
-		})
-		.bundle()
+	tsProject
+		.src()
+		.pipe(sourcemaps.init())
+		.pipe(tsProject())
 		.on('error', fancy_log)
-		.pipe(source('bundle.js'))
-		.pipe(buffer())
-		.pipe(sourcemaps.init({ loadMaps: true }))
+		.js.pipe(
+			babel({
+				presets: ['@babel/preset-env'],
+			})
+		)
 		.pipe(uglify())
 		.pipe(rename({ suffix: '.min' }))
 		.pipe(sourcemaps.write())
