@@ -1,0 +1,58 @@
+@use '../../abstracts/functions' as func;
+
+.custom-radio-button {
+	$bg-color: func.get-color(neutral, 300);
+	position: relative;
+
+	/* hiding default radio button */
+	& input[type='radio'] {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 0;
+		height: 0;
+		appearance: none;
+		opacity: 0;
+	}
+
+	/* label as styling container for custom appearance */
+	&__label {
+		display: inline-grid;
+		place-content: center;
+		/* sizing */
+		width: 100%;
+		padding: var(--spacer-rem-150);
+		/* appearance */
+		background-color: transparent;
+		border-radius: var(--borr-200);
+		transition: background-color 0.35s ease;
+		cursor: pointer;
+	}
+
+	&__label > img {
+		width: 3.2rem;
+		filter: brightness(0) saturate(100%) invert(83%) sepia(22%) saturate(225%) hue-rotate(153deg) brightness(90%)
+			contrast(82%); // filter to the color: --clr-neutral-700
+	}
+
+	/* change label appearance on hover/focus */
+	& input[type='radio']:is(:hover, :focus, :focus-visible) ~ &__label {
+		background-color: fade-out($bg-color, 0.95);
+	}
+
+	/* change label appearance when radio button checked */
+	& input[type='radio']:checked ~ &__label {
+		background-color: var(--clr-neutral-300);
+
+		& > img {
+			filter: brightness(0) saturate(100%) invert(11%) sepia(62%) saturate(385%) hue-rotate(157deg) brightness(97%)
+				contrast(90%); // filter to the color: --clr-neutral-300
+		}
+	}
+
+	/* show outline on label when checked button has hover/focus */
+	& input[type='radio']:checked:is(:hover, :focus, :focus-visible) ~ &__label {
+		outline: 0.2rem solid var(--clr-neutral-300);
+		outline-offset: 0.3rem;
+	}
+}

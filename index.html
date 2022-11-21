@@ -20,31 +20,35 @@
         <h1 class="visually-hidden">Tic tac toe game</h1>
         <div class="container">
             <div id="game-menu" class="game-menu">
-                <img src="./dist/assets/logo.svg" alt="" class="game-menu__icon">
+                <img src="./dist/assets/logo.svg" alt="" class="game-menu__logo">
                 <form class="game-menu-form">
                     <div class="game-menu-form__input-box">
                         <!-- Mark pick start -->
                         <fieldset class="game-menu-form__fieldset">
                             <legend>Pick player 1's mark</legend>
                             <div class="game-menu-form__radio-container">
-                                <label for="x-mark" class="game-menu-form__radio-button">
-                                    <input type="radio" name="p1-mark" id="x-mark" class="visually-hidden">
-                                    <span class="visually-hidden">x mark</span>
-                                    <img src="./dist/assets/icon-x.svg" alt="">
-                                </label>
-                                <label for="o-mark" class="game-menu-form__radio-button">
-                                    <input type="radio" name="p1-mark" id="o-mark" class="visually-hidden">
-                                    <span class="visually-hidden">o mark</span>
-                                    <img src="./dist/assets/icon-o.svg" alt="">
-                                </label>
+                                <div class="custom-radio-button">
+                                    <input type="radio" name="p1-mark" id="x-mark">
+                                    <label for="x-mark" class="custom-radio-button__label">
+                                        <span class="visually-hidden">x mark</span>
+                                        <img src="./dist/assets/icon-x.svg" alt="">
+                                    </label>
+                                </div>
+                                <div class="custom-radio-button">
+                                    <input type="radio" name="p1-mark" id="o-mark">
+                                    <label for="o-mark" class="custom-radio-button__label">
+                                        <span class="visually-hidden">o mark</span>
+                                        <img src="./dist/assets/icon-o.svg" alt="">
+                                    </label>
+                                </div>
                             </div>
                         </fieldset>
                         <!-- Mark pick end -->
                         <p class="game-menu-form__info">Remember: X goes first</p>
                     </div>
                     <div class="game-menu-form__submit-group">
-                        <button type="submit" class="button button--secondary">New Game (vs CPU)</button>
-                        <button type="submit" class="button button--primary">New Game (vs player)</button>
+                        <button type="submit" class="button button--secondary button--large">New Game (vs CPU)</button>
+                        <button type="submit" class="button button--primary button--large">New Game (vs player)</button>
                     </div>
                 </form>
             </div>
