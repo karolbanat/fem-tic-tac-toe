@@ -16,40 +16,76 @@
 
 <body>
 
-    <!-- New game menu start -->
-
-    Pick player 1's mark
-    Remember: X goes first
-
-    New Game (vs CPU)
-    New Game (vs player)
-
-    <!-- New game menu end -->
+    <main>
+        <h1 class="visually-hidden">Tic tac toe game</h1>
+        <div class="container">
+            <div id="game-menu" class="game-menu">
+                <img src="./dist/assets/logo.svg" alt="" class="game-menu__icon">
+                <form class="game-menu-form">
+                    <div class="game-menu-form__input-box">
+                        <!-- Mark pick start -->
+                        <fieldset class="game-menu-form__fieldset">
+                            <legend>Pick player 1's mark</legend>
+                            <div class="game-menu-form__radio-container">
+                                <label for="x-mark" class="game-menu-form__radio-button">
+                                    <input type="radio" name="p1-mark" id="x-mark" class="visually-hidden">
+                                    <span class="visually-hidden">x mark</span>
+                                    <img src="./dist/assets/icon-x.svg" alt="">
+                                </label>
+                                <label for="o-mark" class="game-menu-form__radio-button">
+                                    <input type="radio" name="p1-mark" id="o-mark" class="visually-hidden">
+                                    <span class="visually-hidden">o mark</span>
+                                    <img src="./dist/assets/icon-o.svg" alt="">
+                                </label>
+                            </div>
+                        </fieldset>
+                        <!-- Mark pick end -->
+                        <p class="game-menu-form__info">Remember: X goes first</p>
+                    </div>
+                    <div class="game-menu-form__submit-group">
+                        <button type="submit" class="button button--secondary">New Game (vs CPU)</button>
+                        <button type="submit" class="button button--primary">New Game (vs player)</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
 
     <!-- Game board start -->
 
-    <!-- x/o icon --> turn
+    <!-- [x/o icon] turn -->
 
-    X (You)
-    <!-- Your score -->
-    Ties
-    <!-- Ties score -->
-    X (CPU)
-    <!-- CPU score -->
+    <!-- X (You)
+    Your score -->
+    <!-- Ties
+    Ties score -->
+    <!-- X (CPU)
+    CPU score -->
 
-    Oh no, you lost
+    <!-- Game board end -->
+
+    <!-- Winning/losing modal start -->
+
+    <!-- Oh no, you lost
     You won!
-    Player
-    <!-- 1/2 --> wins!
+    Player 1/2 wins!
 
-    <!-- x/o icon --> takes the round
+    [x/o icon] takes the round
     Round tied
-    Restart game?
 
     Quit
-    Next round
+    Next round -->
+
+    <!-- Winning/losing modal start -->
+
+    <!-- Restart modal start -->
+
+    <!-- Restart game?
+
     No, cancel
-    Yes, restart
+    Yes, restart -->
+
+    <!-- Restart modal start -->
 
     <!-- Game board end -->
 

@@ -47,10 +47,10 @@
 		}
 	}
 
-	/* spacings */
-	@each $unit, $sizes in variables.$spacings {
+	/* spacers */
+	@each $unit, $sizes in variables.$spacers {
 		@each $size, $value in $sizes {
-			--spacing-#{$unit}-#{$size}: #{$value};
+			--spacer-#{$unit}-#{$size}: #{$value};
 		}
 	}
 }
