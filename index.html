@@ -19,13 +19,13 @@
     <main>
         <h1 class="visually-hidden">Tic tac toe game</h1>
         <!-- Game menu start -->
-        <!-- <div class="container">
+        <div class="container">
             <div id="game-menu" class="game-menu">
                 <img src="./dist/assets/logo.svg" alt="" class="game-menu__logo">
                 <form class="game-menu-form">
-                    <div class="game-menu-form__input-box"> -->
-        <!-- Mark pick start -->
-        <!-- <fieldset class="game-menu-form__fieldset">
+                    <div class="game-menu-form__input-box">
+                        <!-- Mark pick start -->
+                        <fieldset class="game-menu-form__fieldset">
                             <legend>Pick player 1's mark</legend>
                             <div class="game-menu-form__radio-container">
                                 <div class="custom-radio-button">
@@ -43,9 +43,9 @@
                                     </label>
                                 </div>
                             </div>
-                        </fieldset> -->
-        <!-- Mark pick end -->
-        <!-- <p class="game-menu-form__info">Remember: X goes first</p>
+                        </fieldset>
+                        <!-- Mark pick end -->
+                        <p class="game-menu-form__info">Remember: X goes first</p>
                     </div>
                     <div class="game-menu-form__submit-group">
                         <button type="submit" class="button button--secondary button--large">New Game (vs CPU)</button>
@@ -53,12 +53,13 @@
                     </div>
                 </form>
             </div>
-        </div> -->
+        </div>
         <!-- Game menu end -->
 
         <!-- Game board start -->
         <div class="container">
-            <div class="tic-tac-toe-game">
+            <div id="tic-tac-toe-game" class="tic-tac-toe-game">
+                <!-- Game header start -->
                 <div class="game-header">
                     <img src="./dist/assets/logo.svg" alt="">
                     <p class="game-header__turn-indicator">
@@ -71,10 +72,10 @@
                         <img src="./dist/assets/icon-restart.svg" alt="">
                     </button>
                 </div>
+                <!-- Game header end -->
+                <!-- Board start -->
                 <div role="group" id="game-board" class="game-board">
-                    <button aria-label="Empty field" class="game-board__field">
-                        <img src="./dist/assets/icon-x.svg" alt="">
-                    </button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
                     <button aria-label="Empty field" class="game-board__field"></button>
                     <button aria-label="Empty field" class="game-board__field"></button>
                     <button aria-label="Empty field" class="game-board__field"></button>
@@ -84,6 +85,8 @@
                     <button aria-label="Empty field" class="game-board__field"></button>
                     <button aria-label="Empty field" class="game-board__field"></button>
                 </div>
+                <!-- Board end -->
+                <!-- Score board start -->
                 <div class="score-board">
                     <div class="score-board__score-container score-board__score-container--primary">
                         <span class="score-board__label">X (You)</span>
@@ -98,6 +101,7 @@
                         <span class="score-board__score">0</span>
                     </div>
                 </div>
+                <!-- Score board end -->
             </div>
         </div>
         <!-- Game board end -->
