@@ -1,0 +1,21 @@
+@use '../../abstracts/mixins' as mxn;
+
+.game-board {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: var(--spacer-rem-300);
+
+	&__field {
+		--shadow-offset-y: var(--spacer-rem-100, 0.8rem);
+		display: grid;
+		place-content: center;
+		padding: var(--spacer-rem-400);
+		width: 100%;
+		aspect-ratio: 1 / 1;
+		background-color: var(--clr-neutral-600);
+		border: none;
+		border-radius: var(--borr-250);
+		box-shadow: inset 0 calc(var(--spacer-rem-100, 0.8rem) * -1) 0 var(--clr-neutral-800);
+		cursor: pointer;
+	}
+}
