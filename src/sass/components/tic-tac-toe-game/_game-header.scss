@@ -1,9 +1,21 @@
 @use '../../abstracts/mixins' as mxn;
 
 .game-header {
-	display: flex;
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: 1fr;
 	align-items: center;
-	justify-content: space-between;
+	gap: var(--spacer-rem-300);
+
+	/* align logo to the left */
+	& > :first-child {
+		justify-self: start;
+	}
+
+	/* align restart button to the right */
+	& > :last-child {
+		justify-self: end;
+	}
 
 	&__turn-indicator {
 		--mark-size: 1.6rem;
@@ -12,6 +24,7 @@
 		--x-spacer: 1.5rem;
 		display: inline-flex;
 		align-items: center;
+		justify-content: center;
 		gap: var(--y-spacer);
 		/* sizing */
 		padding-inline: var(--x-spacer);
@@ -21,6 +34,7 @@
 		font-size: var(--fz-350);
 		font-weight: var(--fw-700, 700);
 		text-transform: uppercase;
+		text-align: center;
 		color: var(--clr-neutral-300);
 		/* appearance */
 		background-color: var(--clr-neutral-600);
