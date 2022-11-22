@@ -18,13 +18,14 @@
 
     <main>
         <h1 class="visually-hidden">Tic tac toe game</h1>
-        <div class="container">
+        <!-- Game menu start -->
+        <!-- <div class="container">
             <div id="game-menu" class="game-menu">
                 <img src="./dist/assets/logo.svg" alt="" class="game-menu__logo">
                 <form class="game-menu-form">
-                    <div class="game-menu-form__input-box">
-                        <!-- Mark pick start -->
-                        <fieldset class="game-menu-form__fieldset">
+                    <div class="game-menu-form__input-box"> -->
+        <!-- Mark pick start -->
+        <!-- <fieldset class="game-menu-form__fieldset">
                             <legend>Pick player 1's mark</legend>
                             <div class="game-menu-form__radio-container">
                                 <div class="custom-radio-button">
@@ -42,9 +43,9 @@
                                     </label>
                                 </div>
                             </div>
-                        </fieldset>
-                        <!-- Mark pick end -->
-                        <p class="game-menu-form__info">Remember: X goes first</p>
+                        </fieldset> -->
+        <!-- Mark pick end -->
+        <!-- <p class="game-menu-form__info">Remember: X goes first</p>
                     </div>
                     <div class="game-menu-form__submit-group">
                         <button type="submit" class="button button--secondary button--large">New Game (vs CPU)</button>
@@ -52,21 +53,53 @@
                     </div>
                 </form>
             </div>
+        </div> -->
+        <!-- Game menu end -->
+
+        <!-- Game board start -->
+        <div class="container">
+            <div class="tic-tac-toe-game">
+                <div class="game-header">
+                    <img src="./dist/assets/logo.svg" alt="">
+                    <p class="game-header__turn-indicator">
+                        <img src="./dist/assets/icon-x.svg" alt="x" id="turn-indicator-mark"
+                             class="game-header__mark-icon">
+                        <span>turn</span>
+                    </p>
+                    <button aria-label="Restart game" id="restart-game-button" class="button button--neutral">
+                        <img src="./dist/assets/icon-restart.svg" alt="">
+                    </button>
+                </div>
+                <div role="group" id="game-board" class="game-board">
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                    <button aria-label="Empty field" class="game-board__field"></button>
+                </div>
+                <div class="score-board">
+                    <div class="score-board__score-container score-board__score-container--primary">
+                        <span class="score-board__label">X (You)</span>
+                        <span class="score-board__score">0</span>
+                    </div>
+                    <div class="score-board__score-container score-board__score-container--neutral">
+                        <span class="score-board__label">Ties</span>
+                        <span class="score-board__score">0</span>
+                    </div>
+                    <div class="score-board__score-container score-board__score-container--secondary">
+                        <span class="score-board__label">O (CPU)</span>
+                        <span class="score-board__score">0</span>
+                    </div>
+                </div>
+            </div>
         </div>
+        <!-- Game board end -->
+
     </main>
-
-    <!-- Game board start -->
-
-    <!-- [x/o icon] turn -->
-
-    <!-- X (You)
-    Your score -->
-    <!-- Ties
-    Ties score -->
-    <!-- X (CPU)
-    CPU score -->
-
-    <!-- Game board end -->
 
     <!-- Winning/losing modal start -->
 
