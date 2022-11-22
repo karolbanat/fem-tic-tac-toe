@@ -1,0 +1,51 @@
+@use '../../abstracts/mixins' as mxn;
+
+.game-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	&__turn-indicator {
+		--mark-size: 1.6rem;
+		--shadow-offset-y: 0.4rem;
+		--y-spacer: 0.9rem;
+		--x-spacer: 1.5rem;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--y-spacer);
+		/* sizing */
+		padding-inline: var(--x-spacer);
+		padding-block-start: var(--y-spacer);
+		padding-block-end: calc(var(--y-spacer) + var(--shadow-offset-y));
+		/* typography */
+		font-size: var(--fz-350);
+		font-weight: var(--fw-700, 700);
+		text-transform: uppercase;
+		letter-spacing: var(--ls-400);
+		/* appearance */
+		background-color: var(--clr-neutral-600);
+		border-radius: var(--borr-100);
+		box-shadow: inset 0 calc(var(--shadow-offset-y) * -1) 0 var(--clr-neutral-800);
+		@include mxn.mq(medium) {
+			--mark-size: 2rem;
+			--shadow-offset-y: 0.6rem;
+			--y-spacer: 1.3rem;
+			--x-spacer: 3rem;
+		}
+	}
+
+	&__mark-icon {
+		width: var(--mark-size);
+		aspect-ratio: 1 / 1;
+		filter: brightness(0) saturate(100%) invert(83%) sepia(22%) saturate(225%) hue-rotate(153deg) brightness(90%)
+			contrast(82%); // filter to the color: --clr-neutral-300
+	}
+
+	/* to change padding of .button class */
+	&__restart-button {
+		padding: var(--spacer-rem-150);
+		@include mxn.mq(medium) {
+			padding: var(--spacer-rem-200);
+		}
+	}
+}

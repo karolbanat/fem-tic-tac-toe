@@ -1,4 +1,4 @@
-@use '../abstracts/mixins' as mxn;
+@use '../../abstracts/mixins' as mxn;
 
 .game-menu {
 	--vertical-spacer: var(--spacer-rem-500, 2em);

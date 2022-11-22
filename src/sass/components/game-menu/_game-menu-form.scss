@@ -1,4 +1,4 @@
-@use '../abstracts/mixins' as mxn;
+@use '../../abstracts/mixins' as mxn;
 
 .game-menu-form {
 	display: grid;
@@ -12,7 +12,7 @@
 		padding-block-end: calc(var(--padding) + var(--shadow-offset-y));
 		/* typography */
 		text-transform: uppercase;
-		letter-spacing: 0.0625em;
+		letter-spacing: var(--ls-400);
 		line-height: 1.25;
 		/* appearance */
 		background-color: var(--clr-neutral-600);

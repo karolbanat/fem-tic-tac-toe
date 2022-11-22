@@ -32,7 +32,7 @@
 	&__label > img {
 		width: 3.2rem;
 		filter: brightness(0) saturate(100%) invert(83%) sepia(22%) saturate(225%) hue-rotate(153deg) brightness(90%)
-			contrast(82%); // filter to the color: --clr-neutral-700
+			contrast(82%); // filter to the color: --clr-neutral-300
 	}
 
 	/* change label appearance on hover/focus */
@@ -46,7 +46,7 @@
 
 		& > img {
 			filter: brightness(0) saturate(100%) invert(11%) sepia(62%) saturate(385%) hue-rotate(157deg) brightness(97%)
-				contrast(90%); // filter to the color: --clr-neutral-300
+				contrast(90%); // filter to the color: --clr-neutral-700
 		}
 	}
 

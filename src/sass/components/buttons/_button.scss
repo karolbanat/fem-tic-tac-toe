@@ -8,7 +8,7 @@
 	font-weight: var(--fw-700, 700);
 	text-transform: uppercase;
 	text-align: center;
-	letter-spacing: 0.0625em;
+	letter-spacing: var(--ls-400);
 	/* appearance */
 	background-color: var(--bg-button);
 	border: none;
@@ -35,11 +35,21 @@
 		--clr-shadow: var(--clr-secondary-500);
 	}
 
+	&--neutral {
+		--bg-button: var(--clr-neutral-300);
+		--bg-button-hover: var(--clr-neutral-200);
+		--clr-shadow: var(--clr-neutral-400);
+	}
+
 	&--large {
 		--fz-button: var(--fz-450);
 	}
 
 	&--medium {
 		--fz-button: var(--fz-400);
+	}
+
+	&--shadow-small {
+		--shadow-offset-y: 0.4rem;
 	}
 }
