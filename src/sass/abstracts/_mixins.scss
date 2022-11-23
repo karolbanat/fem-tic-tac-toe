@@ -7,3 +7,8 @@
 		@content;
 	}
 }
+
+@mixin shadow-box($bg-color, $clr-shadow, $shadow-dir: inset, $shadow-offset-y: 0.8rem, $shadow-offset-x: 0) {
+	background-color: $bg-color;
+	box-shadow: $shadow-dir $shadow-offset-x calc($shadow-offset-y * -1) 0 $clr-shadow;
+}

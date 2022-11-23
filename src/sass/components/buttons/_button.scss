@@ -1,3 +1,5 @@
+@use '../../abstracts/mixins' as mxn;
+
 .button {
 	--shadow-offset-y: var(--spacer-rem-100, 0.8rem);
 	/* sizing */
@@ -11,10 +13,9 @@
 	letter-spacing: var(--ls-400);
 	color: var(--clr-neutral-700);
 	/* appearance */
-	background-color: var(--bg-button);
+	@include mxn.shadow-box(var(--bg-button), var(--clr-shadow), $shadow-offset-y: var(--shadow-offset-y));
 	border: none;
 	border-radius: var(--borr-300);
-	box-shadow: inset 0 calc(var(--shadow-offset-y) * -1) 0 var(--clr-shadow);
 	/* other */
 	transition: background-color 0.4s ease-in-out;
 	cursor: pointer;
