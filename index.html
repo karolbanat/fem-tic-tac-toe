@@ -106,21 +106,18 @@
         </div>
         <!-- Game board end -->
 
+        <!-- Winning/losing modal start -->
+        <div aria-modal="true" aria-labelledby="win-lose-modal-heading" role="dialog" class="modal" data-winner="tie">
+            <p class="modal__message">Oh no, you lost...</p>
+            <h2 class="modal__heading">Round tied</h2>
+            <div class="button-group-flex">
+                <button class="button button--neutral button--shadow-small">Quit</button>
+                <button class="button button--secondary button--shadow-small">Next round</button>
+            </div>
+        </div>
+        <!-- Winning/losing modal end -->
+
     </main>
-
-    <!-- Winning/losing modal start -->
-
-    <!-- Oh no, you lost
-    You won!
-    Player 1/2 wins!
-
-    [x/o icon] takes the round
-    Round tied
-
-    Quit
-    Next round -->
-
-    <!-- Winning/losing modal start -->
 
     <!-- Restart modal start -->
 
@@ -130,8 +127,6 @@
     Yes, restart -->
 
     <!-- Restart modal start -->
-
-    <!-- Game board end -->
 
 </body>
 
