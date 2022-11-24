@@ -2,8 +2,13 @@
 
 .game-menu {
 	--vertical-spacer: var(--spacer-rem-500, 2em);
+	display: block;
 	@include mxn.mq(medium) {
 		--vertical-spacer: var(--spacer-rem-600, 2.5em);
+	}
+
+	&.hidden {
+		display: none;
 	}
 
 	&__logo {

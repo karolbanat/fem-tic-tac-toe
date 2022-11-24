@@ -1,5 +1,8 @@
 .tic-tac-toe-game {
-	display: none;
-	// display: grid;
+	display: grid;
 	gap: var(--spacer-rem-300);
+
+	&.hidden {
+		display: none;
+	}
 }

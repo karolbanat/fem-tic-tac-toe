@@ -29,14 +29,14 @@
                             <legend>Pick player 1's mark</legend>
                             <div class="game-menu-form__radio-container">
                                 <div class="custom-radio-button">
-                                    <input type="radio" name="p1-mark" id="x-mark">
+                                    <input type="radio" name="p1-mark" id="x-mark" data-mark="x">
                                     <label for="x-mark" class="custom-radio-button__label">
                                         <span class="visually-hidden">x mark</span>
                                         <img src="./dist/assets/icon-x.svg" alt="">
                                     </label>
                                 </div>
                                 <div class="custom-radio-button">
-                                    <input type="radio" name="p1-mark" id="o-mark">
+                                    <input type="radio" name="p1-mark" id="o-mark" data-mark="o">
                                     <label for="o-mark" class="custom-radio-button__label">
                                         <span class="visually-hidden">o mark</span>
                                         <img src="./dist/assets/icon-o.svg" alt="">
@@ -48,8 +48,11 @@
                         <p class="game-menu-form__info">Remember: X goes first</p>
                     </div>
                     <div class="game-menu-form__submit-group">
-                        <button type="submit" class="button button--secondary button--large">New Game (vs CPU)</button>
-                        <button type="submit" class="button button--primary button--large">New Game (vs player)</button>
+                        <button type="submit" class="button button--secondary button--large"
+                                data-mode="singleplayer">New
+                            Game (vs CPU)</button>
+                        <button type="submit" class="button button--primary button--large" data-mode="multiplayer">New
+                            Game (vs player)</button>
                     </div>
                 </form>
             </div>
@@ -58,7 +61,7 @@
 
         <!-- Game board start -->
         <div class="container">
-            <div id="tic-tac-toe-game" class="tic-tac-toe-game">
+            <div id="tic-tac-toe-game" class="tic-tac-toe-game hidden">
                 <!-- Game header start -->
                 <div class="game-header">
                     <img src="./dist/assets/logo.svg" alt="">
@@ -131,6 +134,7 @@
 
     </main>
 
+    <script src="./dist/js/main.min.js" defer></script>
 </body>
 
 </html>
