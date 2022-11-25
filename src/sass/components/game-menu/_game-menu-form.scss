@@ -40,12 +40,25 @@
 		}
 	}
 
-	&__info {
+	&__info,
+	&__error-msg {
 		margin-block-start: var(--spacer-rem-200);
 		margin-inline: auto;
 		text-align: center;
 		font-size: var(--fz-300);
+	}
+
+	&__info {
 		opacity: 0.5;
+	}
+
+	&__error-msg {
+		display: none;
+		color: var(--clr-accent-400);
+
+		&.visible {
+			display: block;
+		}
 	}
 
 	&__submit-group {
