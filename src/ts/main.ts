@@ -1,11 +1,4 @@
-const gameMenu: HTMLElement = document.querySelector('#game-menu');
-/* form elements */
-const gameMenuForm: HTMLFormElement = gameMenu.querySelector('.game-menu-form');
-const menuFormOptions: NodeListOf<HTMLInputElement> = gameMenuForm.querySelectorAll('input[type="radio"]');
-const menuErrorMsg: HTMLElement = gameMenuForm.querySelector('[role="alert"]');
-const menuFormSubmitButtons: NodeListOf<HTMLButtonElement> = document.querySelectorAll('button[type="submit"]');
-/* game view: container with header, game board and scores */
-const ticTacToeGameView: HTMLElement = document.querySelector('#tic-tac-toe-game');
+/* score board elements */
 const p1NameElement: HTMLElement = document.querySelector('#p1-game-name');
 const p1ScoreElement: HTMLElement = document.querySelector('#p1-game-score');
 const p2NameElement: HTMLElement = document.querySelector('#p2-game-name');
@@ -14,9 +7,17 @@ const tiesScoreElement: HTMLElement = document.querySelector('#game-ties');
 
 /* classes */
 class Game {
+	private gameMenu: GameMenu;
+	private gameContainer: HTMLElement;
 	private xPlayer: Player;
 	private oPlayer: Player;
 	private ties: number = 0;
+
+	constructor(gameMenuId: string, gameContainerId: string) {
+		this.gameMenu = new GameMenu(gameMenuId, this.init);
+		this.gameMenu.init();
+		this.gameContainer = document.querySelector(gameContainerId);
+	}
 
 	init = (mode: string, p1Mark: string): void => {
 		const p2Mark: string = p1Mark === 'x' ? 'o' : 'x';
@@ -31,7 +32,57 @@ class Game {
 			this.oPlayer = new Player(p1Label, p1Mark);
 		}
 
+		this.gameContainer.classList.remove('hidden');
 		initializeScoreBoard(this.xPlayer, this.oPlayer, this.ties);
+	};
+}
+
+class GameMenu {
+	private gameMenu: HTMLElement;
+	private menuForm: HTMLFormElement;
+	private formOptions: NodeListOf<HTMLInputElement>;
+	private errorMsg: HTMLElement;
+	private formSubmitButtons: NodeListOf<HTMLButtonElement>;
+
+	constructor(gameMenuId: string, private gameInit: (mode: string, p1Mark: string) => void) {
+		this.gameMenu = document.querySelector(gameMenuId);
+		this.menuForm = this.gameMenu.querySelector('form');
+		this.formOptions = this.menuForm.querySelectorAll('input[type="radio"]');
+		this.errorMsg = this.menuForm.querySelector('[role="alert"]');
+		this.formSubmitButtons = this.menuForm.querySelectorAll('button[type="submit"]');
+	}
+
+	init = (): void => {
+		this.formSubmitButtons.forEach(btn => btn.addEventListener('click', this.handleMenuSubmitButton));
+	};
+
+	handleMenuSubmitButton = (ev: Event): void => {
+		ev.preventDefault();
+		if (!this.isAnyOptionSelected()) {
+			this.errorMsg.classList.add('visible');
+			this.errorMsg.innerText = 'Please select mark for player 1';
+			return;
+		} else {
+			this.errorMsg.classList.remove('visible');
+			this.errorMsg.innerText = '';
+		}
+
+		const submitBtn: HTMLButtonElement = ev.target as HTMLButtonElement;
+		const gameMode: string = submitBtn.dataset.mode;
+		const p1Mark: string = this.getCheckedOptionMark();
+		this.gameMenu.classList.add('hidden');
+		this.gameInit(gameMode, p1Mark); // method from the parent Game class
+	};
+
+	isAnyOptionSelected = (): boolean => {
+		return Array.from(this.formOptions).some(option => option.checked);
+	};
+
+	getCheckedOptionMark = (): string | null => {
+		for (const option of this.formOptions) {
+			if (option.checked) return option.dataset.mark;
+		}
+		return null;
 	};
 }
 
@@ -49,7 +100,7 @@ class Player {
 /* classes end */
 
 /* game objects */
-const ticTacToeGame: Game = new Game();
+const ticTacToeGame: Game = new Game('#game-menu', '#tic-tac-toe-game');
 /* game objects end */
 
 const initializeScoreBoard = (p1: Player, p2: Player, ties: number) => {
@@ -59,38 +110,3 @@ const initializeScoreBoard = (p1: Player, p2: Player, ties: number) => {
 	p2ScoreElement.innerText = p2.getScore().toString();
 	tiesScoreElement.innerText = ties.toString();
 };
-
-/* game menu form handlings */
-const isAnyOptionChecked = () => {
-	return Array.from(menuFormOptions).some(option => option.checked);
-};
-
-const getCheckedOptionMark = (): string => {
-	for (const option of menuFormOptions) {
-		if (option.checked) return option.dataset.mark;
-	}
-	return '';
-};
-
-const handleMenuSubmitButton = (ev: Event) => {
-	ev.preventDefault();
-	/* Checks if any mark is selected. If none then displays error */
-	if (!isAnyOptionChecked()) {
-		menuErrorMsg.classList.add('visible');
-		menuErrorMsg.innerText = 'Please select mark for player 1';
-		return;
-	} else {
-		menuErrorMsg.classList.remove('visible');
-		menuErrorMsg.innerText = '';
-	}
-
-	const submitBtn: HTMLButtonElement = ev.target as HTMLButtonElement;
-	const gameMode: string = submitBtn.dataset.mode;
-	const p1Mark: string = getCheckedOptionMark();
-	gameMenu.classList.add('hidden');
-	ticTacToeGameView.classList.remove('hidden');
-	ticTacToeGame.init(gameMode, p1Mark);
-};
-/* game menu form handlings end */
-
-menuFormSubmitButtons.forEach(btn => btn.addEventListener('click', handleMenuSubmitButton));
