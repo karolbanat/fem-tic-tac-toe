@@ -1,14 +1,9 @@
-/* score board elements */
-const p1NameElement: HTMLElement = document.querySelector('#p1-game-name');
-const p1ScoreElement: HTMLElement = document.querySelector('#p1-game-score');
-const p2NameElement: HTMLElement = document.querySelector('#p2-game-name');
-const p2ScoreElement: HTMLElement = document.querySelector('#p2-game-score');
-const tiesScoreElement: HTMLElement = document.querySelector('#game-ties');
-
 /* classes */
+/* Game class start */
 class Game {
 	private gameMenu: GameMenu;
 	private gameContainer: HTMLElement;
+	private scoreBoard: ScoreBoard;
 	private xPlayer: Player;
 	private oPlayer: Player;
 	private ties: number = 0;
@@ -17,6 +12,7 @@ class Game {
 		this.gameMenu = new GameMenu(gameMenuId, this.init);
 		this.gameMenu.init();
 		this.gameContainer = document.querySelector(gameContainerId);
+		this.scoreBoard = new ScoreBoard('#score-board');
 	}
 
 	init = (mode: string, p1Mark: string): void => {
@@ -33,10 +29,12 @@ class Game {
 		}
 
 		this.gameContainer.classList.remove('hidden');
-		initializeScoreBoard(this.xPlayer, this.oPlayer, this.ties);
+		this.scoreBoard.init(this.xPlayer, this.oPlayer, this.ties);
 	};
 }
+/* Game class end */
 
+/* GameMenu class start */
 class GameMenu {
 	private gameMenu: HTMLElement;
 	private menuForm: HTMLFormElement;
@@ -78,14 +76,48 @@ class GameMenu {
 		return Array.from(this.formOptions).some(option => option.checked);
 	};
 
-	getCheckedOptionMark = (): string | null => {
+	getCheckedOptionMark = (): string => {
 		for (const option of this.formOptions) {
 			if (option.checked) return option.dataset.mark;
 		}
-		return null;
+		return '';
 	};
 }
+/* GameMenu class end */
 
+/* ScoreBoard class start */
+class ScoreBoard {
+	private scoreBoardContainer: HTMLElement;
+	private p1Label: HTMLElement;
+	private p1Score: HTMLElement;
+	private p2Label: HTMLElement;
+	private p2Score: HTMLElement;
+	private tiesScore: HTMLElement;
+
+	constructor(scoreBoardId: string) {
+		this.scoreBoardContainer = document.querySelector(scoreBoardId);
+		this.p1Label = this.scoreBoardContainer.querySelector('#p1-game-name');
+		this.p1Score = this.scoreBoardContainer.querySelector('#p1-game-score');
+		this.p2Label = this.scoreBoardContainer.querySelector('#p2-game-name');
+		this.p2Score = this.scoreBoardContainer.querySelector('#p2-game-score');
+		this.tiesScore = this.scoreBoardContainer.querySelector('#game-ties');
+	}
+
+	init = (p1: Player, p2: Player, ties: number = 0): void => {
+		this.p1Label.innerText = p1.toString();
+		this.p2Label.innerText = p2.toString();
+		this.updateScore(p1, p2, ties);
+	};
+
+	updateScore = (p1: Player, p2: Player, ties: number): void => {
+		this.p1Score.innerText = p1.getScore().toString();
+		this.p2Score.innerText = p2.getScore().toString();
+		this.tiesScore.innerText = ties.toString();
+	};
+}
+/* ScoreBoard class end */
+
+/* Player class start */
 class Player {
 	constructor(private name: string, private mark: string, private score: number = 0) {}
 
@@ -97,16 +129,9 @@ class Player {
 
 	updateScore = (): number => ++this.score;
 }
+/* Player class end */
 /* classes end */
 
 /* game objects */
 const ticTacToeGame: Game = new Game('#game-menu', '#tic-tac-toe-game');
 /* game objects end */
-
-const initializeScoreBoard = (p1: Player, p2: Player, ties: number) => {
-	p1NameElement.innerText = p1.toString();
-	p1ScoreElement.innerText = p1.getScore().toString();
-	p2NameElement.innerText = p2.toString();
-	p2ScoreElement.innerText = p2.getScore().toString();
-	tiesScoreElement.innerText = ties.toString();
-};
