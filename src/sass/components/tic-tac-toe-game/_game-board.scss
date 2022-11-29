@@ -20,5 +20,17 @@
 			$shadow-offset-y: var(--spacer-rem-100, 0.8rem)
 		);
 		cursor: pointer;
+
+		& img {
+			display: none;
+		}
+
+		&[data-current-player='x'] img[data-name='x-outline-icon'] {
+			display: block;
+		}
+
+		&[data-current-player='o'] img[data-name='o-outline-icon'] {
+			display: block;
+		}
 	}
 }

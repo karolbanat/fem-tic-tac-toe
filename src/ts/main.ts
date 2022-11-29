@@ -7,6 +7,7 @@ class Game {
 	private scoreBoard: ScoreBoard;
 	private xPlayer: Player;
 	private oPlayer: Player;
+	private currentPlayer: Player;
 	private ties: number = 0;
 
 	constructor(gameMenuId: string, gameContainerId: string) {
@@ -14,7 +15,7 @@ class Game {
 		this.gameMenu.init();
 		this.gameContainer = document.querySelector(gameContainerId);
 		this.scoreBoard = new ScoreBoard('#score-board');
-		this.gameBoard = new GameBoard('#game-board', this.onFieldClick);
+		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
 	}
 
 	init = (mode: string, p1Mark: string): void => {
@@ -30,6 +31,7 @@ class Game {
 			this.oPlayer = new Player(p1Label, p1Mark);
 		}
 
+		this.currentPlayer = this.xPlayer;
 		this.gameContainer.classList.remove('hidden');
 		this.scoreBoard.init(this.xPlayer, this.oPlayer, this.ties);
 		this.gameBoard.init();
@@ -37,6 +39,10 @@ class Game {
 
 	onFieldClick = (ev: Event): void => {
 		this.makeMove();
+	};
+
+	getCurrentPlayerMark = (): string => {
+		return this.currentPlayer.getMark();
 	};
 
 	makeMove = () => {};
@@ -132,7 +138,7 @@ class GameBoard {
 	private boardElement: HTMLElement;
 	private board: Field[][] = [[], [], []];
 
-	constructor(gameBoardId: string, private onFieldClick: (ev: Event) => void) {
+	constructor(gameBoardId: string, private onFieldClick: (ev: Event) => void, private getCurrentMark: () => string) {
 		this.boardElement = document.querySelector(gameBoardId);
 	}
 
@@ -141,7 +147,13 @@ class GameBoard {
 		for (let row = 0; row < this.board.length; row++) {
 			for (let column = 0; column < this.BOARD_SIZE; column++) {
 				this.board[row].push(
-					new Field(row, column, boardFieldElements[column + row * this.BOARD_SIZE], this.onFieldClick)
+					new Field(
+						row,
+						column,
+						boardFieldElements[column + row * this.BOARD_SIZE],
+						this.onFieldClick,
+						this.getCurrentMark
+					)
 				);
 			}
 		}
@@ -163,15 +175,59 @@ class Field {
 		private row: number,
 		private column: number,
 		private fieldElement: HTMLButtonElement,
-		private gameOnClickHandler: (ev: Event) => void
+		private gameOnClickHandler: (ev: Event) => void,
+		private getCurrentMark: () => string
 	) {
 		if (this.fieldElement) {
+			/* click handling */
 			this.fieldElement.addEventListener('click', this.gameOnClickHandler);
+			/* hover/focus in handling */
+			this.fieldElement.addEventListener('mouseover', this.handleHover);
+			this.fieldElement.addEventListener('focusin', this.handleHover);
+			/* hover/focus out handling */
+			this.fieldElement.addEventListener('mouseout', this.handleBlur);
+			this.fieldElement.addEventListener('focusout', this.handleBlur);
+			/* setting attributs */
 			this.fieldElement.dataset.row = this.row.toString();
 			this.fieldElement.dataset.column = this.column.toString();
 			this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, empty field`);
+
+			this.insertImages();
 		}
 	}
+
+	handleHover = (): void => {
+		const currentPlayerMark = this.getCurrentMark();
+		this.fieldElement.setAttribute('data-current-player', currentPlayerMark);
+	};
+
+	handleBlur = () => {
+		this.fieldElement.removeAttribute('data-current-player');
+	};
+
+	insertImages = () => {
+		const oImage = document.createElement('img');
+		oImage.setAttribute('src', './dist/assets/icon-o.svg');
+		oImage.setAttribute('alt', '');
+		oImage.setAttribute('data-name', 'o-icon');
+		const oOutlineImage = document.createElement('img');
+		oOutlineImage.setAttribute('src', './dist/assets/icon-o-outline.svg');
+		oOutlineImage.setAttribute('alt', '');
+		oImage.setAttribute('data-name', 'o-outline-icon');
+		const xImage = document.createElement('img');
+		xImage.setAttribute('src', './dist/assets/icon-x.svg');
+		xImage.setAttribute('alt', '');
+		xImage.setAttribute('data-name', 'x-icon');
+		const xOutlineImage = document.createElement('img');
+		xOutlineImage.setAttribute('src', './dist/assets/icon-x-outline.svg');
+		xOutlineImage.setAttribute('alt', '');
+		xOutlineImage.setAttribute('data-name', 'x-outline-icon');
+
+		this.fieldElement.appendChild(oImage);
+		this.fieldElement.appendChild(xImage);
+		this.fieldElement.appendChild(oOutlineImage);
+		this.fieldElement.appendChild(xOutlineImage);
+	};
 
 	check = (mark: string): void => {
 		this.mark = mark;
