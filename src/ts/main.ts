@@ -3,6 +3,7 @@
 class Game {
 	private gameMenu: GameMenu;
 	private gameContainer: HTMLElement;
+	private gameBoard: GameBoard;
 	private scoreBoard: ScoreBoard;
 	private xPlayer: Player;
 	private oPlayer: Player;
@@ -13,6 +14,7 @@ class Game {
 		this.gameMenu.init();
 		this.gameContainer = document.querySelector(gameContainerId);
 		this.scoreBoard = new ScoreBoard('#score-board');
+		this.gameBoard = new GameBoard('#game-board', this.onFieldClick);
 	}
 
 	init = (mode: string, p1Mark: string): void => {
@@ -30,7 +32,14 @@ class Game {
 
 		this.gameContainer.classList.remove('hidden');
 		this.scoreBoard.init(this.xPlayer, this.oPlayer, this.ties);
+		this.gameBoard.init();
 	};
+
+	onFieldClick = (ev: Event): void => {
+		this.makeMove();
+	};
+
+	makeMove = () => {};
 }
 /* Game class end */
 
@@ -116,6 +125,68 @@ class ScoreBoard {
 	};
 }
 /* ScoreBoard class end */
+
+/* GameBoard class start */
+class GameBoard {
+	private BOARD_SIZE: number = 3;
+	private boardElement: HTMLElement;
+	private board: Field[][] = [[], [], []];
+
+	constructor(gameBoardId: string, private onFieldClick: (ev: Event) => void) {
+		this.boardElement = document.querySelector(gameBoardId);
+	}
+
+	init = (): void => {
+		const boardFieldElements: NodeListOf<HTMLButtonElement> = this.boardElement.querySelectorAll('.game-board__field');
+		for (let row = 0; row < this.board.length; row++) {
+			for (let column = 0; column < this.BOARD_SIZE; column++) {
+				this.board[row].push(
+					new Field(row, column, boardFieldElements[column + row * this.BOARD_SIZE], this.onFieldClick)
+				);
+			}
+		}
+	};
+
+	checkField = (mark: string, row: number, column: number) => {
+		if (row < this.board.length && column < this.board[0].length) {
+			this.board[row][column].check(mark);
+		}
+	};
+}
+/* GameBoard class end */
+
+/* Field class start */
+class Field {
+	private mark: string = null;
+
+	constructor(
+		private row: number,
+		private column: number,
+		private fieldElement: HTMLButtonElement,
+		private gameOnClickHandler: (ev: Event) => void
+	) {
+		if (this.fieldElement) {
+			this.fieldElement.addEventListener('click', this.gameOnClickHandler);
+			this.fieldElement.dataset.row = this.row.toString();
+			this.fieldElement.dataset.column = this.column.toString();
+			this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, empty field`);
+		}
+	}
+
+	check = (mark: string): void => {
+		this.mark = mark;
+		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, ${this.mark} mark`);
+	};
+
+	isChecked = (): boolean => {
+		return this.mark !== null;
+	};
+
+	getMark = (): string => {
+		return this.mark;
+	};
+}
+/* Field class end */
 
 /* Player class start */
 class Player {
