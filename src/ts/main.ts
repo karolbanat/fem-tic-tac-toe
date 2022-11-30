@@ -1,13 +1,16 @@
 /* classes */
 /* Game class start */
 class Game {
+	/* game elements */
 	private gameMenu: GameMenu;
 	private gameContainer: HTMLElement;
 	private gameBoard: GameBoard;
 	private scoreBoard: ScoreBoard;
+	/* players */
 	private xPlayer: Player;
 	private oPlayer: Player;
 	private playerQueue: [Player, Player];
+	/* game states */
 	private ties: number = 0;
 	private gameCount: number = 0;
 	private turnCount: number = 0;
@@ -22,21 +25,42 @@ class Game {
 
 	init = (mode: string, p1Mark: string): void => {
 		const p2Mark: string = p1Mark === 'x' ? 'o' : 'x';
-		const p1Label: string = mode === 'singleplayer' ? 'you' : 'p1';
-		const p2Label: string = mode === 'singleplayer' ? 'cpu' : 'p2';
+		let p1Label: string, player1: Player;
+		let p2Label: string, player2: Player;
 
-		if (p1Mark === 'x') {
-			this.xPlayer = new Player(p1Label, p1Mark);
-			this.oPlayer = mode === 'singleplayer' ? new CPUPlayer(p2Label, p2Mark) : new Player(p2Label, p2Mark);
+		/* creates labels and players depending on game mode */
+		if (mode === 'singleplayer') {
+			p1Label = 'you';
+			p2Label = 'cpu';
+			player2 = new CPUPlayer(p2Label, p2Mark);
 		} else {
-			this.xPlayer = mode === 'singleplayer' ? new CPUPlayer(p2Label, p2Mark) : new Player(p2Label, p2Mark);
-			this.oPlayer = new Player(p1Label, p1Mark);
+			p1Label = 'p1';
+			p2Label = 'p2';
+			player2 = new Player(p2Label, p2Mark);
+		}
+		player1 = new Player(p1Label, p1Mark);
+
+		/* assigns created players to right spots */
+		if (p1Mark === 'x') {
+			this.xPlayer = player1;
+			this.oPlayer = player2;
+		} else {
+			this.xPlayer = player2;
+			this.oPlayer = player1;
 		}
 
+		/* creates tuple of players, to choose current player depending on turn counter */
 		this.playerQueue = [this.xPlayer, this.oPlayer];
+
+		/* shows game container */
 		this.gameContainer.classList.remove('hidden');
+
+		/* initialize score board with created players */
 		this.scoreBoard.init(this.xPlayer, this.oPlayer, this.ties);
+
+		/* initialize game board */
 		this.gameBoard.init();
+
 		/* if starting player is CPU then make auto move */
 		if (this.getCurrentPlayer() instanceof CPUPlayer) {
 			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
@@ -44,6 +68,7 @@ class Game {
 	};
 
 	onFieldClick = (ev: Event): void => {
+		/* retrieve row and column from clicked button and make move */
 		const fieldButton = ev.target as HTMLButtonElement;
 		const row: number = parseInt(fieldButton.dataset.row);
 		const column: number = parseInt(fieldButton.dataset.column);
@@ -61,6 +86,7 @@ class Game {
 	makeMove = (row: number, column: number): void => {
 		/* on field click, if field is checked then return doing nothing */
 		if (this.gameBoard.isFieldChecked(row, column)) return;
+
 		/* if current player is CPU then make auto move */
 		if (this.getCurrentPlayer() instanceof CPUPlayer) {
 			[row, column] = (this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard);
@@ -107,6 +133,7 @@ class GameMenu {
 
 	handleMenuSubmitButton = (ev: Event): void => {
 		ev.preventDefault();
+		/* shows error if any field wasn't selected */
 		if (!this.isAnyOptionSelected()) {
 			this.errorMsg.classList.add('visible');
 			this.errorMsg.innerText = 'Please select mark for player 1';
@@ -116,10 +143,15 @@ class GameMenu {
 			this.errorMsg.innerText = '';
 		}
 
+		/* retrieve game mode from submit button clicked and selected mark from options */
 		const submitBtn: HTMLButtonElement = ev.target as HTMLButtonElement;
 		const gameMode: string = submitBtn.dataset.mode;
 		const p1Mark: string = this.getCheckedOptionMark();
+
+		/* hides game menu */
 		this.gameMenu.classList.add('hidden');
+
+		/* and runs game initialization */
 		this.gameInit(gameMode, p1Mark); // method from the parent Game class
 	};
 
@@ -179,7 +211,10 @@ class GameBoard {
 	}
 
 	init = (): void => {
+		/* gets all board fields */
 		const boardFieldElements: NodeListOf<HTMLButtonElement> = this.boardElement.querySelectorAll('.game-board__field');
+
+		/* creating fields */
 		for (let row = 0; row < this.board.length; row++) {
 			for (let column = 0; column < this.BOARD_SIZE; column++) {
 				this.board[row].push(
@@ -187,6 +222,7 @@ class GameBoard {
 						row,
 						column,
 						boardFieldElements[column + row * this.BOARD_SIZE],
+						// handles for field(buttons) events
 						this.onFieldClick,
 						this.getCurrentMark
 					)
@@ -195,6 +231,7 @@ class GameBoard {
 		}
 	};
 
+	/* checks/marks field on passed position */
 	checkField = (mark: string, row: number, column: number) => {
 		if (row < this.board.length && column < this.board[0].length) {
 			this.board[row][column].check(mark);
@@ -225,12 +262,15 @@ class Field {
 		if (this.fieldElement) {
 			/* click handling */
 			this.fieldElement.addEventListener('click', this.gameOnClickHandler);
+
 			/* hover/focus in handling */
 			this.fieldElement.addEventListener('mouseover', this.handleHover);
 			this.fieldElement.addEventListener('focusin', this.handleHover);
+
 			/* hover/focus out handling */
 			this.fieldElement.addEventListener('mouseout', this.handleBlur);
 			this.fieldElement.addEventListener('focusout', this.handleBlur);
+
 			/* setting attributs */
 			this.fieldElement.dataset.row = this.row.toString();
 			this.fieldElement.dataset.column = this.column.toString();
@@ -240,33 +280,43 @@ class Field {
 		}
 	}
 
+	/* hover/focus in field handle */
 	handleHover = (): void => {
 		const currentPlayerMark = this.getCurrentMark();
 		this.fieldElement.setAttribute('data-current-player', currentPlayerMark);
 	};
 
+	/* hover/focus out field handle */
 	handleBlur = () => {
 		this.fieldElement.removeAttribute('data-current-player');
 	};
 
 	insertImages = () => {
+		/* O image */
 		const oImage = document.createElement('img');
 		oImage.setAttribute('src', './dist/assets/icon-o.svg');
 		oImage.setAttribute('alt', '');
 		oImage.setAttribute('data-name', 'o-icon');
+
+		/* O outline image */
 		const oOutlineImage = document.createElement('img');
 		oOutlineImage.setAttribute('src', './dist/assets/icon-o-outline.svg');
 		oOutlineImage.setAttribute('alt', '');
 		oOutlineImage.setAttribute('data-name', 'o-outline-icon');
+
+		/* X image */
 		const xImage = document.createElement('img');
 		xImage.setAttribute('src', './dist/assets/icon-x.svg');
 		xImage.setAttribute('alt', '');
 		xImage.setAttribute('data-name', 'x-icon');
+
+		/* X outline image */
 		const xOutlineImage = document.createElement('img');
 		xOutlineImage.setAttribute('src', './dist/assets/icon-x-outline.svg');
 		xOutlineImage.setAttribute('alt', '');
 		xOutlineImage.setAttribute('data-name', 'x-outline-icon');
 
+		/* appending created images to the button */
 		this.fieldElement.appendChild(oImage);
 		this.fieldElement.appendChild(xImage);
 		this.fieldElement.appendChild(oOutlineImage);
