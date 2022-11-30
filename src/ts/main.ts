@@ -27,9 +27,9 @@ class Game {
 
 		if (p1Mark === 'x') {
 			this.xPlayer = new Player(p1Label, p1Mark);
-			this.oPlayer = new Player(p2Label, p2Mark);
+			this.oPlayer = mode === 'singleplayer' ? new CPUPlayer(p2Label, p2Mark) : new Player(p2Label, p2Mark);
 		} else {
-			this.xPlayer = new Player(p2Label, p2Mark);
+			this.xPlayer = mode === 'singleplayer' ? new CPUPlayer(p2Label, p2Mark) : new Player(p2Label, p2Mark);
 			this.oPlayer = new Player(p1Label, p1Mark);
 		}
 
@@ -37,6 +37,10 @@ class Game {
 		this.gameContainer.classList.remove('hidden');
 		this.scoreBoard.init(this.xPlayer, this.oPlayer, this.ties);
 		this.gameBoard.init();
+		/* if starting player is CPU then make auto move */
+		if (this.getCurrentPlayer() instanceof CPUPlayer) {
+			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
+		}
 	};
 
 	onFieldClick = (ev: Event): void => {
@@ -55,10 +59,24 @@ class Game {
 	};
 
 	makeMove = (row: number, column: number): void => {
+		/* on field click, if field is checked then return doing nothing */
 		if (this.gameBoard.isFieldChecked(row, column)) return;
+		/* if current player is CPU then make auto move */
+		if (this.getCurrentPlayer() instanceof CPUPlayer) {
+			[row, column] = (this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard);
+		}
 
+		/* checks selected field */
 		this.gameBoard.checkField(this.getCurrentPlayer().getMark(), row, column);
 		this.increaseTurnCount();
+
+		/* if board is full return before checking if next move should be done by CPU */
+		if (this.gameBoard.isFull()) return;
+
+		/* after then field is checked, checks if current player is CPU and if is, then makes a move */
+		if (this.getCurrentPlayer() instanceof CPUPlayer) {
+			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
+		}
 	};
 
 	increaseTurnCount = (): number => {
@@ -152,7 +170,7 @@ class ScoreBoard {
 
 /* GameBoard class start */
 class GameBoard {
-	private BOARD_SIZE: number = 3;
+	BOARD_SIZE: number = 3;
 	private boardElement: HTMLElement;
 	private board: Field[][] = [[], [], []];
 
@@ -185,6 +203,10 @@ class GameBoard {
 
 	isFieldChecked = (row: number, column: number): boolean => {
 		return this.board[row][column].isChecked();
+	};
+
+	isFull = (): boolean => {
+		return this.board.flat().every(field => field.isChecked());
 	};
 }
 /* GameBoard class end */
@@ -278,6 +300,18 @@ class Player {
 	getScore = (): number => this.score;
 
 	updateScore = (): number => ++this.score;
+}
+
+class CPUPlayer extends Player {
+	makeMove = (board: GameBoard): [number, number] => {
+		const boardSize = board.BOARD_SIZE;
+		let row, column;
+		do {
+			row = Math.floor(Math.random() * boardSize);
+			column = Math.floor(Math.random() * boardSize);
+		} while (board.isFieldChecked(row, column));
+		return [row, column];
+	};
 }
 /* Player class end */
 /* classes end */
