@@ -21,15 +21,27 @@
 		);
 		cursor: pointer;
 
+		& * {
+			pointer-events: none;
+		}
+
 		& img {
 			display: none;
 		}
 
-		&[data-current-player='x'] img[data-name='x-outline-icon'] {
+		&[data-current-player='x']:not([data-mark]) img[data-name='x-outline-icon'] {
 			display: block;
 		}
 
-		&[data-current-player='o'] img[data-name='o-outline-icon'] {
+		&[data-current-player='o']:not([data-mark]) img[data-name='o-outline-icon'] {
+			display: block;
+		}
+
+		&[data-mark='x'] img[data-name='x-icon'] {
+			display: block;
+		}
+
+		&[data-mark='o'] img[data-name='o-icon'] {
 			display: block;
 		}
 	}

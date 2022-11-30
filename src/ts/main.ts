@@ -7,8 +7,10 @@ class Game {
 	private scoreBoard: ScoreBoard;
 	private xPlayer: Player;
 	private oPlayer: Player;
-	private currentPlayer: Player;
+	private playerQueue: [Player, Player];
 	private ties: number = 0;
+	private gameCount: number = 0;
+	private turnCount: number = 0;
 
 	constructor(gameMenuId: string, gameContainerId: string) {
 		this.gameMenu = new GameMenu(gameMenuId, this.init);
@@ -31,21 +33,37 @@ class Game {
 			this.oPlayer = new Player(p1Label, p1Mark);
 		}
 
-		this.currentPlayer = this.xPlayer;
+		this.playerQueue = [this.xPlayer, this.oPlayer];
 		this.gameContainer.classList.remove('hidden');
 		this.scoreBoard.init(this.xPlayer, this.oPlayer, this.ties);
 		this.gameBoard.init();
 	};
 
 	onFieldClick = (ev: Event): void => {
-		this.makeMove();
+		const fieldButton = ev.target as HTMLButtonElement;
+		const row: number = parseInt(fieldButton.dataset.row);
+		const column: number = parseInt(fieldButton.dataset.column);
+		this.makeMove(row, column);
 	};
 
 	getCurrentPlayerMark = (): string => {
-		return this.currentPlayer.getMark();
+		return this.getCurrentPlayer().getMark();
 	};
 
-	makeMove = () => {};
+	getCurrentPlayer = (): Player => {
+		return this.playerQueue[this.turnCount % 2];
+	};
+
+	makeMove = (row: number, column: number): void => {
+		if (this.gameBoard.isFieldChecked(row, column)) return;
+
+		this.gameBoard.checkField(this.getCurrentPlayer().getMark(), row, column);
+		this.increaseTurnCount();
+	};
+
+	increaseTurnCount = (): number => {
+		return ++this.turnCount;
+	};
 }
 /* Game class end */
 
@@ -164,6 +182,10 @@ class GameBoard {
 			this.board[row][column].check(mark);
 		}
 	};
+
+	isFieldChecked = (row: number, column: number): boolean => {
+		return this.board[row][column].isChecked();
+	};
 }
 /* GameBoard class end */
 
@@ -213,7 +235,7 @@ class Field {
 		const oOutlineImage = document.createElement('img');
 		oOutlineImage.setAttribute('src', './dist/assets/icon-o-outline.svg');
 		oOutlineImage.setAttribute('alt', '');
-		oImage.setAttribute('data-name', 'o-outline-icon');
+		oOutlineImage.setAttribute('data-name', 'o-outline-icon');
 		const xImage = document.createElement('img');
 		xImage.setAttribute('src', './dist/assets/icon-x.svg');
 		xImage.setAttribute('alt', '');
@@ -232,6 +254,7 @@ class Field {
 	check = (mark: string): void => {
 		this.mark = mark;
 		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, ${this.mark} mark`);
+		this.fieldElement.setAttribute('data-mark', mark);
 	};
 
 	isChecked = (): boolean => {
