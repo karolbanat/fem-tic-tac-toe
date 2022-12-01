@@ -6,8 +6,7 @@ class Game {
 	private gameContainer: HTMLElement;
 	private gameBoard: GameBoard;
 	private scoreBoard: ScoreBoard;
-	private currentPlayerMarkElement: HTMLElement;
-	private currentPlayerMarkIcon: HTMLImageElement;
+	private turnIndicator: TurnIndicator;
 	/* players */
 	private xPlayer: Player;
 	private oPlayer: Player;
@@ -23,8 +22,7 @@ class Game {
 		this.gameContainer = document.querySelector(gameContainerId);
 		this.scoreBoard = new ScoreBoard('#score-board');
 		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
-		this.currentPlayerMarkElement = this.gameContainer.querySelector('#current-player-mark');
-		this.currentPlayerMarkIcon = this.gameContainer.querySelector('#current-player-mark-icon');
+		this.turnIndicator = new TurnIndicator();
 	}
 
 	init = (mode: string, p1Mark: string): void => {
@@ -65,7 +63,7 @@ class Game {
 		/* initialize game board */
 		this.gameBoard.init();
 
-		this.updateCurrentPlayerIndication();
+		this.turnIndicator.update(this.getCurrentPlayerMark());
 
 		/* if starting player is CPU then make auto move */
 		if (this.getCurrentPlayer() instanceof CPUPlayer) {
@@ -101,7 +99,7 @@ class Game {
 		/* checks selected field */
 		this.gameBoard.checkField(this.getCurrentPlayer().getMark(), row, column);
 		this.increaseTurnCount();
-		this.updateCurrentPlayerIndication();
+		this.turnIndicator.update(this.getCurrentPlayerMark());
 
 		/* if board is full return before checking if next move should be done by CPU */
 		if (this.gameBoard.isFull()) return;
@@ -110,12 +108,6 @@ class Game {
 		if (this.getCurrentPlayer() instanceof CPUPlayer) {
 			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
 		}
-	};
-
-	updateCurrentPlayerIndication = () => {
-		const mark = this.getCurrentPlayerMark();
-		this.currentPlayerMarkElement.innerText = mark;
-		this.currentPlayerMarkIcon.src = `./dist/assets/icon-${mark}.svg`;
 	};
 
 	increaseTurnCount = (): number => {
@@ -180,6 +172,23 @@ class GameMenu {
 	};
 }
 /* GameMenu class end */
+
+/* TurnIndicator class start */
+class TurnIndicator {
+	private currentPlayerMarkElement: HTMLElement;
+	private currentPlayerMarkIcon: HTMLImageElement;
+
+	constructor() {
+		this.currentPlayerMarkElement = document.querySelector('#current-player-mark');
+		this.currentPlayerMarkIcon = document.querySelector('#current-player-mark-icon');
+	}
+
+	update = (mark: string) => {
+		this.currentPlayerMarkElement.innerText = mark;
+		this.currentPlayerMarkIcon.src = `./dist/assets/icon-${mark}.svg`;
+	};
+}
+/* TurnIndicator class end */
 
 /* ScoreBoard class start */
 class ScoreBoard {
