@@ -1,3 +1,4 @@
+type TripleField = [Field, Field, Field];
 /* classes */
 /* Game class start */
 class Game {
@@ -98,6 +99,7 @@ class Game {
 
 		/* checks selected field */
 		this.gameBoard.checkField(this.getCurrentPlayer().getMark(), row, column);
+		console.log(this.gameBoard.getWinningFields());
 		this.increaseTurnCount();
 		this.turnIndicator.update(this.getCurrentPlayerMark());
 
@@ -266,6 +268,55 @@ class GameBoard {
 
 	isFull = (): boolean => {
 		return this.board.flat().every(field => field.isChecked());
+	};
+
+	getWinningFields = (): TripleField | null => {
+		return this.checkRows() || this.checkColumns() || this.checkDiagonal();
+	};
+
+	checkRows = (): TripleField | null => {
+		for (let row = 0; row < this.BOARD_SIZE; row++) {
+			if (
+				this.board[row][0].getMark() !== null &&
+				this.board[row][0].getMark() === this.board[row][1].getMark() &&
+				this.board[row][1].getMark() === this.board[row][2].getMark()
+			)
+				return [this.board[row][0], this.board[row][1], this.board[row][2]];
+		}
+		return null;
+	};
+
+	checkColumns = (): TripleField | null => {
+		for (let column = 0; column < this.BOARD_SIZE; column++) {
+			if (
+				this.board[0][column].getMark() !== null &&
+				this.board[0][column].getMark() === this.board[1][column].getMark() &&
+				this.board[1][column].getMark() === this.board[2][column].getMark()
+			)
+				return [this.board[0][column], this.board[1][column], this.board[2][column]];
+		}
+		return null;
+	};
+
+	checkDiagonal = (): TripleField | null => {
+		/* top left, middle, and bottom right */
+		if (
+			this.board[1][1].getMark() !== null &&
+			this.board[0][0].getMark() === this.board[1][1].getMark() &&
+			this.board[1][1].getMark() === this.board[2][2].getMark()
+		)
+			return [this.board[0][0], this.board[1][1], this.board[2][2]];
+
+		/* top right, middle, and bottom left */
+		if (
+			this.board[1][1].getMark() !== null &&
+			this.board[0][2].getMark() === this.board[1][1].getMark() &&
+			this.board[1][1].getMark() === this.board[2][0].getMark()
+		)
+			return [this.board[0][0], this.board[1][1], this.board[2][2]];
+
+		/* no fields matched */
+		return null;
 	};
 }
 /* GameBoard class end */
