@@ -58,6 +58,10 @@ class Game {
 		/* shows game container */
 		this.gameContainer.classList.remove('hidden');
 
+		this.startGame();
+	};
+
+	startGame = (): void => {
 		/* initialize score board with created players */
 		this.scoreBoard.init(this.xPlayer, this.oPlayer, this.ties);
 
@@ -67,9 +71,7 @@ class Game {
 		this.turnIndicator.update(this.getCurrentPlayerMark());
 
 		/* if starting player is CPU then make auto move */
-		if (this.getCurrentPlayer() instanceof CPUPlayer) {
-			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
-		}
+		this.makeMoveCPU();
 	};
 
 	onFieldClick = (ev: Event): void => {
@@ -92,24 +94,34 @@ class Game {
 		/* on field click, if field is checked then return doing nothing */
 		if (this.gameBoard.isFieldChecked(row, column)) return;
 
-		/* if current player is CPU then make auto move */
-		if (this.getCurrentPlayer() instanceof CPUPlayer) {
-			[row, column] = (this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard);
-		}
-
 		/* checks selected field */
 		this.gameBoard.checkField(this.getCurrentPlayer().getMark(), row, column);
-		console.log(this.gameBoard.getWinningFields());
-		this.increaseTurnCount();
-		this.turnIndicator.update(this.getCurrentPlayerMark());
+		this.afterMove();
+	};
 
-		/* if board is full return before checking if next move should be done by CPU */
-		if (this.gameBoard.isFull()) return;
-
-		/* after then field is checked, checks if current player is CPU and if is, then makes a move */
+	makeMoveCPU = (): void => {
+		/* after field is checked, checks if current player is CPU and if is, then makes a move */
 		if (this.getCurrentPlayer() instanceof CPUPlayer) {
 			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
 		}
+	};
+
+	afterMove = (): void => {
+		const winningFields = this.gameBoard.getWinningFields();
+		if (winningFields !== null) {
+			console.log(this.getCurrentPlayerMark() + ' is winner');
+			return;
+		}
+
+		if (this.gameBoard.isFull()) {
+			console.log('a tie');
+			return;
+		}
+
+		this.increaseTurnCount();
+		this.turnIndicator.update(this.getCurrentPlayerMark());
+
+		this.makeMoveCPU();
 	};
 
 	increaseTurnCount = (): number => {
