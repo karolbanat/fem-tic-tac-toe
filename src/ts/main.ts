@@ -1,4 +1,7 @@
+/* types */
 type TripleField = [Field, Field, Field];
+/* types end */
+
 /* classes */
 /* Game class start */
 class Game {
@@ -99,13 +102,6 @@ class Game {
 		this.afterMove();
 	};
 
-	makeMoveCPU = (): void => {
-		/* after field is checked, checks if current player is CPU and if is, then makes a move */
-		if (this.getCurrentPlayer() instanceof CPUPlayer) {
-			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
-		}
-	};
-
 	afterMove = (): void => {
 		const winningFields = this.gameBoard.getWinningFields();
 		if (winningFields !== null) {
@@ -122,6 +118,13 @@ class Game {
 		this.turnIndicator.update(this.getCurrentPlayerMark());
 
 		this.makeMoveCPU();
+	};
+
+	makeMoveCPU = (): void => {
+		/* after field is checked, checks if current player is CPU and if is, then makes a move */
+		if (this.getCurrentPlayer() instanceof CPUPlayer) {
+			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
+		}
 	};
 
 	increaseTurnCount = (): number => {
