@@ -28,7 +28,7 @@ class Game {
 		this.scoreBoard = new ScoreBoard('#score-board');
 		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
 		this.turnIndicator = new TurnIndicator();
-		this.gameResultModal = new ResultModal(this.onGameContinue);
+		this.gameResultModal = new ResultModal(this.onGameQuit, this.onGameContinue);
 	}
 
 	onFieldClick = (ev: Event): void => {
@@ -45,6 +45,12 @@ class Game {
 		this.gameBoard.clear();
 		this.scoreBoard.updateScore(this.xPlayer, this.oPlayer, this.ties);
 		this.makeMoveCPU();
+	};
+
+	onGameQuit = (): void => {
+		this.gameContainer.classList.add('hidden');
+		this.gameBoard.clear();
+		this.gameMenu.show();
 	};
 
 	init = (mode: string, p1Mark: string): void => {
@@ -183,10 +189,18 @@ class GameMenu {
 		const p1Mark: string = this.getCheckedOptionMark();
 
 		/* hides game menu */
-		this.gameMenu.classList.add('hidden');
+		this.hide();
 
 		/* and runs game initialization */
 		this.gameInit(gameMode, p1Mark); // method from the parent Game class
+	};
+
+	show = (): void => {
+		this.gameMenu.classList.remove('hidden');
+	};
+
+	hide = (): void => {
+		this.gameMenu.classList.add('hidden');
 	};
 
 	isAnyOptionSelected = (): boolean => {
@@ -259,11 +273,16 @@ class ResultModal {
 	private quitButton: HTMLButtonElement;
 	private continueButton: HTMLButtonElement;
 
-	constructor(private gameContinueHandling: () => void) {
+	constructor(private gameQuitHandling: () => void, private gameContinueHandling: () => void) {
 		this.modal = document.querySelector('#game-result-modal');
 		this.modalMessage = this.modal.querySelector('.modal__message');
 		this.modalHeading = this.modal.querySelector('.modal__heading');
+
+		/* quit button */
 		this.quitButton = this.modal.querySelector('button[data-action="quit"]');
+		this.quitButton.addEventListener('click', this.handleQuit);
+
+		/* continue button */
 		this.continueButton = this.modal.querySelector('button[data-action="continue"]');
 		this.continueButton.addEventListener('click', this.handleContinue);
 	}
@@ -271,6 +290,11 @@ class ResultModal {
 	handleContinue = (ev: Event): void => {
 		this.gameContinueHandling();
 		this.hide();
+	};
+
+	handleQuit = (): void => {
+		this.hide();
+		this.gameQuitHandling();
 	};
 
 	show = (winner: Player | null = null): void => {
@@ -357,13 +381,14 @@ class ResultModal {
 class GameBoard {
 	BOARD_SIZE: number = 3;
 	private boardElement: HTMLElement;
-	private board: Field[][] = [[], [], []];
+	private board: Field[][];
 
 	constructor(gameBoardId: string, private onFieldClick: (ev: Event) => void, private getCurrentMark: () => string) {
 		this.boardElement = document.querySelector(gameBoardId);
 	}
 
 	init = (): void => {
+		this.board = [[], [], []];
 		/* gets all board fields */
 		const boardFieldElements: NodeListOf<HTMLButtonElement> = this.boardElement.querySelectorAll('.game-board__field');
 
@@ -484,9 +509,7 @@ class Field {
 			/* setting attributs */
 			this.fieldElement.dataset.row = this.row.toString();
 			this.fieldElement.dataset.column = this.column.toString();
-			this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, empty field`);
-
-			this.insertImages();
+			this.clear();
 		}
 	}
 
@@ -506,38 +529,6 @@ class Field {
 		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, empty field`);
 		this.fieldElement.removeAttribute('data-current-player');
 		this.fieldElement.removeAttribute('data-mark');
-	};
-
-	insertImages = () => {
-		/* O image */
-		const oImage = document.createElement('img');
-		oImage.setAttribute('src', './dist/assets/icon-o.svg');
-		oImage.setAttribute('alt', '');
-		oImage.setAttribute('data-name', 'o-icon');
-
-		/* O outline image */
-		const oOutlineImage = document.createElement('img');
-		oOutlineImage.setAttribute('src', './dist/assets/icon-o-outline.svg');
-		oOutlineImage.setAttribute('alt', '');
-		oOutlineImage.setAttribute('data-name', 'o-outline-icon');
-
-		/* X image */
-		const xImage = document.createElement('img');
-		xImage.setAttribute('src', './dist/assets/icon-x.svg');
-		xImage.setAttribute('alt', '');
-		xImage.setAttribute('data-name', 'x-icon');
-
-		/* X outline image */
-		const xOutlineImage = document.createElement('img');
-		xOutlineImage.setAttribute('src', './dist/assets/icon-x-outline.svg');
-		xOutlineImage.setAttribute('alt', '');
-		xOutlineImage.setAttribute('data-name', 'x-outline-icon');
-
-		/* appending created images to the button */
-		this.fieldElement.appendChild(oImage);
-		this.fieldElement.appendChild(xImage);
-		this.fieldElement.appendChild(oOutlineImage);
-		this.fieldElement.appendChild(xOutlineImage);
 	};
 
 	check = (mark: string): void => {
