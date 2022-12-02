@@ -11,6 +11,7 @@ class Game {
 	private gameBoard: GameBoard;
 	private scoreBoard: ScoreBoard;
 	private turnIndicator: TurnIndicator;
+	private gameResultModal: ResultModal;
 	/* players */
 	private xPlayer: Player;
 	private oPlayer: Player;
@@ -27,6 +28,7 @@ class Game {
 		this.scoreBoard = new ScoreBoard('#score-board');
 		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
 		this.turnIndicator = new TurnIndicator();
+		this.gameResultModal = new ResultModal();
 	}
 
 	init = (mode: string, p1Mark: string): void => {
@@ -105,12 +107,12 @@ class Game {
 	afterMove = (): void => {
 		const winningFields = this.gameBoard.getWinningFields();
 		if (winningFields !== null) {
-			console.log(this.getCurrentPlayerMark() + ' is winner');
+			this.gameResultModal.show(this.getCurrentPlayer());
 			return;
 		}
 
 		if (this.gameBoard.isFull()) {
-			console.log('a tie');
+			this.gameResultModal.show();
 			return;
 		}
 
@@ -238,6 +240,98 @@ class ScoreBoard {
 	};
 }
 /* ScoreBoard class end */
+
+/* ResultModal class start */
+class ResultModal {
+	private modal: HTMLElement;
+	private modalMessage: HTMLParagraphElement;
+	private modalHeading: HTMLHeadingElement;
+	private quitButton: HTMLButtonElement;
+	private continueButton: HTMLButtonElement;
+
+	constructor() {
+		this.modal = document.querySelector('#game-result-modal');
+		this.modalMessage = this.modal.querySelector('.modal__message');
+		this.modalHeading = this.modal.querySelector('.modal__heading');
+		this.quitButton = this.modal.querySelector('button[data-action="quit"]');
+		this.continueButton = this.modal.querySelector('button[data-action="continue"]');
+	}
+
+	show = (winner: Player | null = null): void => {
+		this.modal.classList.add('active');
+		this.updateResult(winner);
+	};
+
+	updateResult = (winner: Player | null): void => {
+		if (winner === null) this.displayTieResult();
+		else this.displayWinnerResult(winner);
+
+		this.quitButton.focus();
+	};
+
+	displayTieResult = (): void => {
+		this.modal.setAttribute('data-winner', 'tie');
+		this.modalHeading.innerHTML = '';
+		this.modalHeading.innerText = 'Round tied';
+	};
+
+	displayWinnerResult = (winner: Player): void => {
+		this.modal.setAttribute('data-winner', winner.getMark());
+
+		const message = this.getRoundMessage(winner.getName());
+		this.modalMessage.innerText = message;
+		this.setResultHeading(winner);
+	};
+
+	setResultHeading = (winner: Player): void => {
+		/* clear heading before setting message */
+		this.modalHeading.innerHTML = '';
+		const mark = winner.getMark();
+
+		/* winning mark icon */
+		const imgElement = document.createElement('img');
+		imgElement.setAttribute('src', `./dist/assets/icon-${mark}.svg`);
+		imgElement.setAttribute('alt', '');
+
+		/* hidden mark for screen readers */
+		const hiddenMark = document.createElement('span');
+		hiddenMark.classList.add('visually-hidden');
+		hiddenMark.innerText = mark;
+
+		/* message after image */
+		const messageText = document.createTextNode('takes the round');
+
+		/* span container for hidden mark and message text */
+		const headingSpan = document.createElement('span');
+		headingSpan.appendChild(hiddenMark);
+		headingSpan.appendChild(messageText);
+
+		this.modalHeading.appendChild(imgElement);
+		this.modalHeading.appendChild(headingSpan);
+	};
+
+	getRoundMessage = (playerName: string): string => {
+		let message;
+		switch (playerName) {
+			case 'p1':
+				message = 'Player 1 wins!';
+				break;
+			case 'p2':
+				message = 'Player 2 wins!';
+				break;
+			case 'you':
+				message = 'You won!';
+				break;
+			case 'cpu':
+				message = 'Oh no, you lost...';
+				break;
+			default:
+				message = '';
+		}
+		return message;
+	};
+}
+/* ResultModal class end */
 
 /* GameBoard class start */
 class GameBoard {
@@ -432,6 +526,8 @@ class Player {
 	constructor(private name: string, private mark: string, private score: number = 0) {}
 
 	toString = (): string => `${this.mark} (${this.name})`;
+
+	getName = (): string => this.name;
 
 	getMark = (): string => this.mark;
 

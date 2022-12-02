@@ -55,10 +55,24 @@
 
 	/* elements */
 	&__heading {
+		--icon-width: 3rem;
+		--gap: var(--spacer-rem-100);
+		display: inline-flex;
+		align-items: center;
+		gap: var(--gap);
 		margin-block-end: var(--spacer-rem-400);
 		font-size: var(--fz-700);
 		font-weight: var(--fw-700, 700);
 		color: var(--clr-heading);
+		@include mxn.mq(medium) {
+			--icon-width: auto;
+			--gap: var(--spacer-rem-400);
+		}
+
+		& img {
+			width: var(--icon-width);
+			aspect-ratio: 1;
+		}
 	}
 
 	&__message {

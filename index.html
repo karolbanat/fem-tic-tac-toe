@@ -111,19 +111,21 @@
         <!-- Game board end -->
 
         <!-- Winning/losing modal start -->
-        <div aria-modal="true" aria-labelledby="win-lose-modal-heading" role="dialog" class="modal" data-winner="o">
+        <div aria-modal="true" aria-labelledby="win-lose-modal-heading" role="dialog" id="game-result-modal"
+             class="modal" data-winner="o">
             <p class="modal__message">Oh no, you lost...</p>
             <h2 id="win-lose-modal-heading" class="modal__heading">Round tied</h2>
             <div class="button-group-flex">
-                <button class="button button--neutral button--shadow-small">Quit</button>
-                <button class="button button--secondary button--shadow-small">Next round</button>
+                <button class="button button--neutral button--shadow-small" data-action="quit">Quit</button>
+                <button class="button button--secondary button--shadow-small" data-action="continue">Next round</button>
             </div>
         </div>
         <div class="modal-dropshadow"></div>
         <!-- Winning/losing modal end -->
 
         <!-- Restart modal start -->
-        <div aria-modal="true" aria-labelledby="restart-modal-heading" role="dialog" class="modal">
+        <div aria-modal="true" aria-labelledby="restart-modal-heading" role="dialog" id="game-reset-modal"
+             class="modal">
             <h2 id="restart-modal-heading" class="modal__heading">Restart game?</h2>
             <div class="button-group-flex">
                 <button class="button button--neutral button--shadow-small">No, cancel</button>
