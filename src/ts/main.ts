@@ -28,8 +28,24 @@ class Game {
 		this.scoreBoard = new ScoreBoard('#score-board');
 		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
 		this.turnIndicator = new TurnIndicator();
-		this.gameResultModal = new ResultModal();
+		this.gameResultModal = new ResultModal(this.onGameContinue);
 	}
+
+	onFieldClick = (ev: Event): void => {
+		/* retrieve row and column from clicked button and make move */
+		const fieldButton = ev.target as HTMLButtonElement;
+		const row: number = parseInt(fieldButton.dataset.row);
+		const column: number = parseInt(fieldButton.dataset.column);
+		this.makeMove(row, column);
+	};
+
+	onGameContinue = () => {
+		this.gameCount++;
+		this.turnCount = 0;
+		this.gameBoard.clear();
+		this.scoreBoard.updateScore(this.xPlayer, this.oPlayer, this.ties);
+		this.makeMoveCPU();
+	};
 
 	init = (mode: string, p1Mark: string): void => {
 		const p2Mark: string = p1Mark === 'x' ? 'o' : 'x';
@@ -79,20 +95,12 @@ class Game {
 		this.makeMoveCPU();
 	};
 
-	onFieldClick = (ev: Event): void => {
-		/* retrieve row and column from clicked button and make move */
-		const fieldButton = ev.target as HTMLButtonElement;
-		const row: number = parseInt(fieldButton.dataset.row);
-		const column: number = parseInt(fieldButton.dataset.column);
-		this.makeMove(row, column);
-	};
-
 	getCurrentPlayerMark = (): string => {
 		return this.getCurrentPlayer().getMark();
 	};
 
 	getCurrentPlayer = (): Player => {
-		return this.playerQueue[this.turnCount % 2];
+		return this.playerQueue[(this.gameCount + this.turnCount) % 2];
 	};
 
 	makeMove = (row: number, column: number): void => {
@@ -108,11 +116,13 @@ class Game {
 		const winningFields = this.gameBoard.getWinningFields();
 		if (winningFields !== null) {
 			this.gameResultModal.show(this.getCurrentPlayer());
+			this.getCurrentPlayer().updateScore();
 			return;
 		}
 
 		if (this.gameBoard.isFull()) {
 			this.gameResultModal.show();
+			this.ties++;
 			return;
 		}
 
@@ -249,17 +259,27 @@ class ResultModal {
 	private quitButton: HTMLButtonElement;
 	private continueButton: HTMLButtonElement;
 
-	constructor() {
+	constructor(private gameContinueHandling: () => void) {
 		this.modal = document.querySelector('#game-result-modal');
 		this.modalMessage = this.modal.querySelector('.modal__message');
 		this.modalHeading = this.modal.querySelector('.modal__heading');
 		this.quitButton = this.modal.querySelector('button[data-action="quit"]');
 		this.continueButton = this.modal.querySelector('button[data-action="continue"]');
+		this.continueButton.addEventListener('click', this.handleContinue);
 	}
+
+	handleContinue = (ev: Event): void => {
+		this.gameContinueHandling();
+		this.hide();
+	};
 
 	show = (winner: Player | null = null): void => {
 		this.modal.classList.add('active');
 		this.updateResult(winner);
+	};
+
+	hide = (): void => {
+		this.modal.classList.remove('active');
 	};
 
 	updateResult = (winner: Player | null): void => {
@@ -427,6 +447,14 @@ class GameBoard {
 		/* no fields matched */
 		return null;
 	};
+
+	clear = (): void => {
+		for (let row = 0; row < this.board.length; row++) {
+			for (let column = 0; column < this.BOARD_SIZE; column++) {
+				this.board[row][column].clear();
+			}
+		}
+	};
 }
 /* GameBoard class end */
 
@@ -471,6 +499,13 @@ class Field {
 	/* hover/focus out field handle */
 	handleBlur = () => {
 		this.fieldElement.removeAttribute('data-current-player');
+	};
+
+	clear = (): void => {
+		this.mark = null;
+		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, empty field`);
+		this.fieldElement.removeAttribute('data-current-player');
+		this.fieldElement.removeAttribute('data-mark');
 	};
 
 	insertImages = () => {
