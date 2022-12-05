@@ -12,6 +12,8 @@ class Game {
 	private scoreBoard: ScoreBoard;
 	private turnIndicator: TurnIndicator;
 	private gameResultModal: ResultModal;
+	private restartGameButton: HTMLButtonElement;
+	private restartGameModal: RestartModal;
 	/* players */
 	private xPlayer: Player;
 	private oPlayer: Player;
@@ -29,6 +31,9 @@ class Game {
 		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
 		this.turnIndicator = new TurnIndicator();
 		this.gameResultModal = new ResultModal(this.onGameQuit, this.onGameContinue);
+		this.restartGameModal = new RestartModal(this.restartGame);
+		this.restartGameButton = this.gameContainer.querySelector('#restart-game-button');
+		this.restartGameButton.addEventListener('click', this.onRestartButtonClick);
 	}
 
 	onFieldClick = (ev: Event): void => {
@@ -43,7 +48,7 @@ class Game {
 		this.gameCount++;
 		this.turnCount = 0;
 		this.gameBoard.clear();
-		this.scoreBoard.updateScore(this.xPlayer, this.oPlayer, this.ties);
+		this.updateScoreBoard();
 		this.makeMoveCPU();
 	};
 
@@ -51,6 +56,10 @@ class Game {
 		this.gameContainer.classList.add('hidden');
 		this.gameBoard.clear();
 		this.gameMenu.show();
+	};
+
+	onRestartButtonClick = (ev: Event): void => {
+		this.restartGameModal.show();
 	};
 
 	init = (mode: string, p1Mark: string): void => {
@@ -95,10 +104,34 @@ class Game {
 		/* initialize game board */
 		this.gameBoard.init();
 
-		this.turnIndicator.update(this.getCurrentPlayerMark());
+		this.updateTurnIndicator();
 
 		/* if starting player is CPU then make auto move */
 		this.makeMoveCPU();
+	};
+
+	restartGame = (): void => {
+		/* reset counters */
+		this.ties = 0;
+		this.turnCount = 0;
+		this.gameCount = 0;
+
+		/* reset board */
+		this.gameBoard.clear();
+
+		/* reset players */
+		this.xPlayer.resetScore();
+		this.oPlayer.resetScore();
+
+		/* update score board */
+		this.updateScoreBoard();
+		this.updateTurnIndicator();
+
+		/* to make move if first player is CPU */
+		this.makeMoveCPU();
+
+		/* set focus to restart button */
+		this.restartGameButton.focus();
 	};
 
 	getCurrentPlayerMark = (): string => {
@@ -133,7 +166,7 @@ class Game {
 		}
 
 		this.increaseTurnCount();
-		this.turnIndicator.update(this.getCurrentPlayerMark());
+		this.updateTurnIndicator();
 
 		this.makeMoveCPU();
 	};
@@ -143,6 +176,14 @@ class Game {
 		if (this.getCurrentPlayer() instanceof CPUPlayer) {
 			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
 		}
+	};
+
+	updateTurnIndicator = (): void => {
+		this.turnIndicator.update(this.getCurrentPlayerMark());
+	};
+
+	updateScoreBoard = (): void => {
+		this.scoreBoard.updateScore(this.xPlayer, this.oPlayer, this.ties);
 	};
 
 	increaseTurnCount = (): number => {
@@ -377,6 +418,43 @@ class ResultModal {
 }
 /* ResultModal class end */
 
+/* RestartModal class start */
+class RestartModal {
+	private modal: HTMLElement;
+	private cancelButton: HTMLButtonElement;
+	private restartButton: HTMLButtonElement;
+
+	constructor(private gameRestartHandling: () => void) {
+		this.modal = document.querySelector('#game-reset-modal');
+
+		/* cancel button */
+		this.cancelButton = this.modal.querySelector('button[data-action="cancel"]');
+		this.cancelButton.addEventListener('click', this.handleCancel);
+
+		/* restart button */
+		this.restartButton = this.modal.querySelector('button[data-action="restart"]');
+		this.restartButton.addEventListener('click', this.handleRestart);
+	}
+
+	handleCancel = (): void => {
+		this.hide();
+	};
+
+	handleRestart = (): void => {
+		this.gameRestartHandling();
+		this.hide();
+	};
+
+	show = (): void => {
+		this.modal.classList.add('active');
+	};
+
+	hide = (): void => {
+		this.modal.classList.remove('active');
+	};
+}
+/* RestartModal class start */
+
 /* GameBoard class start */
 class GameBoard {
 	BOARD_SIZE: number = 3;
@@ -506,7 +584,7 @@ class Field {
 			this.fieldElement.addEventListener('mouseout', this.handleBlur);
 			this.fieldElement.addEventListener('focusout', this.handleBlur);
 
-			/* setting attributs */
+			/* setting attributes */
 			this.fieldElement.dataset.row = this.row.toString();
 			this.fieldElement.dataset.column = this.column.toString();
 			this.clear();
@@ -560,6 +638,10 @@ class Player {
 	getScore = (): number => this.score;
 
 	updateScore = (): number => ++this.score;
+
+	resetScore = (): void => {
+		this.score = 0;
+	};
 }
 
 class CPUPlayer extends Player {
