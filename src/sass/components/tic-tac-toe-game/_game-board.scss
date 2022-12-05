@@ -6,6 +6,8 @@
 	gap: var(--spacer-rem-300);
 
 	&__field {
+		--bg-shadow-box: var(--clr-neutral-600);
+		--clr-shadow: var(--clr-neutral-800);
 		--shadow-offset-y: var(--spacer-rem-100, 0.8rem);
 		display: grid;
 		place-content: center;
@@ -14,11 +16,7 @@
 		aspect-ratio: 1 / 1;
 		border: none;
 		border-radius: var(--borr-250);
-		@include mxn.shadow-box(
-			var(--clr-neutral-600),
-			var(--clr-neutral-800),
-			$shadow-offset-y: var(--spacer-rem-100, 0.8rem)
-		);
+		@include mxn.shadow-box(var(--bg-shadow-box), var(--clr-shadow), $shadow-offset-y: var(--spacer-rem-100, 0.8rem));
 		cursor: pointer;
 
 		& * {
@@ -29,6 +27,7 @@
 			display: none;
 		}
 
+		/* image state handling start */
 		&[data-current-player='x']:not([data-mark]) img[data-name='x-outline-icon'] {
 			display: block;
 		}
@@ -43,6 +42,22 @@
 
 		&[data-mark='o'] img[data-name='o-icon'] {
 			display: block;
+		}
+		/* image state handling end */
+
+		&[data-mark='x'][data-game-winning] {
+			--bg-shadow-box: var(--clr-primary-400);
+			--clr-shadow: var(--clr-primary-500);
+		}
+
+		&[data-mark='o'][data-game-winning] {
+			--bg-shadow-box: var(--clr-secondary-400);
+			--clr-shadow: var(--clr-secondary-500);
+		}
+
+		&[data-game-winning] img {
+			filter: brightness(0) saturate(100%) invert(11%) sepia(62%) saturate(385%) hue-rotate(157deg) brightness(97%)
+				contrast(90%); // filter to the color: --clr-neutral-700
 		}
 	}
 }

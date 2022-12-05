@@ -513,7 +513,11 @@ class GameBoard {
 				this.board[row][0].getMark() === this.board[row][1].getMark() &&
 				this.board[row][1].getMark() === this.board[row][2].getMark()
 			)
-				return [this.board[row][0], this.board[row][1], this.board[row][2]];
+				return [
+					this.board[row][0].setAsGameWinning(),
+					this.board[row][1].setAsGameWinning(),
+					this.board[row][2].setAsGameWinning(),
+				];
 		}
 		return null;
 	};
@@ -525,7 +529,11 @@ class GameBoard {
 				this.board[0][column].getMark() === this.board[1][column].getMark() &&
 				this.board[1][column].getMark() === this.board[2][column].getMark()
 			)
-				return [this.board[0][column], this.board[1][column], this.board[2][column]];
+				return [
+					this.board[0][column].setAsGameWinning(),
+					this.board[1][column].setAsGameWinning(),
+					this.board[2][column].setAsGameWinning(),
+				];
 		}
 		return null;
 	};
@@ -537,7 +545,11 @@ class GameBoard {
 			this.board[0][0].getMark() === this.board[1][1].getMark() &&
 			this.board[1][1].getMark() === this.board[2][2].getMark()
 		)
-			return [this.board[0][0], this.board[1][1], this.board[2][2]];
+			return [
+				this.board[0][0].setAsGameWinning(),
+				this.board[1][1].setAsGameWinning(),
+				this.board[2][2].setAsGameWinning(),
+			];
 
 		/* top right, middle, and bottom left */
 		if (
@@ -545,7 +557,11 @@ class GameBoard {
 			this.board[0][2].getMark() === this.board[1][1].getMark() &&
 			this.board[1][1].getMark() === this.board[2][0].getMark()
 		)
-			return [this.board[0][0], this.board[1][1], this.board[2][2]];
+			return [
+				this.board[0][2].setAsGameWinning(),
+				this.board[1][1].setAsGameWinning(),
+				this.board[2][0].setAsGameWinning(),
+			];
 
 		/* no fields matched */
 		return null;
@@ -605,6 +621,7 @@ class Field {
 	clear = (): void => {
 		this.mark = null;
 		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, empty field`);
+		this.fieldElement.removeAttribute('data-game-winning');
 		this.fieldElement.removeAttribute('data-current-player');
 		this.fieldElement.removeAttribute('data-mark');
 	};
@@ -617,6 +634,11 @@ class Field {
 
 	isChecked = (): boolean => {
 		return this.mark !== null;
+	};
+
+	setAsGameWinning = (): Field => {
+		this.fieldElement.setAttribute('data-game-winning', '');
+		return this;
 	};
 
 	getMark = (): string => {
