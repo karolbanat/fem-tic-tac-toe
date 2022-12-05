@@ -56,8 +56,7 @@
 		}
 
 		&[data-game-winning] img {
-			filter: brightness(0) saturate(100%) invert(11%) sepia(62%) saturate(385%) hue-rotate(157deg) brightness(97%)
-				contrast(90%); // filter to the color: --clr-neutral-700
+			@include mxn.image-neutral-700-filter;
 		}
 	}
 }

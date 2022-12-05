@@ -54,8 +54,7 @@
 	&__mark-icon {
 		width: var(--mark-size);
 		aspect-ratio: 1 / 1;
-		filter: brightness(0) saturate(100%) invert(83%) sepia(22%) saturate(225%) hue-rotate(153deg) brightness(90%)
-			contrast(82%); // filter to the color: --clr-neutral-300
+		@include mxn.image-neutral-300-filter;
 	}
 
 	/* to change padding of .button class */
