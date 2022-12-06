@@ -268,7 +268,7 @@ class CPUPlayer extends Player {
 
 	getPlay = (board: GameBoard, compareToMark: string): [number, number] | null => {
 		const boardSize: number = board.BOARD_SIZE;
-		/* check rows */
+		/* check rows and columns */
 		for (let rowNumber = 0; rowNumber < boardSize; rowNumber++) {
 			const fieldsRow: TripleField = board.getRow(rowNumber);
 			let sameMarkCount: number = 0;
@@ -282,6 +282,8 @@ class CPUPlayer extends Player {
 				}
 			}
 
+			/*  if there are two mark in checked line and empty field,
+                then return coordinates of empty field */
 			if (sameMarkCount === 2 && emptyFieldCount === 1) {
 				return [emptyField.getRow(), emptyField.getColumn()];
 			}
@@ -289,11 +291,11 @@ class CPUPlayer extends Player {
 
 		/* check columns */
 		for (let colNumber = 0; colNumber < boardSize; colNumber++) {
-			const fieldsRow: TripleField = board.getColumn(colNumber);
+			const fieldsColumn: TripleField = board.getColumn(colNumber);
 			let sameMarkCount: number = 0;
 			let emptyFieldCount: number = 0;
 			let emptyField: Field;
-			for (const field of fieldsRow) {
+			for (const field of fieldsColumn) {
 				if (field.getMark() === compareToMark) sameMarkCount++;
 				if (field.getMark() === null) {
 					emptyFieldCount++;
@@ -301,6 +303,8 @@ class CPUPlayer extends Player {
 				}
 			}
 
+			/*  if there are two mark in checked line and empty field,
+                then return coordinates of empty field */
 			if (sameMarkCount === 2 && emptyFieldCount === 1) {
 				return [emptyField.getRow(), emptyField.getColumn()];
 			}
@@ -320,6 +324,8 @@ class CPUPlayer extends Player {
 			}
 		}
 
+		/*  if there are two mark in checked line and empty field,
+            then return coordinates of empty field */
 		if (sameMarkCount === 2 && emptyFieldCount === 1) {
 			return [emptyField.getRow(), emptyField.getColumn()];
 		}
@@ -337,6 +343,8 @@ class CPUPlayer extends Player {
 			}
 		}
 
+		/*  if there are two mark in checked line and empty field,
+            then return coordinates of empty field */
 		if (sameMarkCount === 2 && emptyFieldCount === 1) {
 			return [emptyField.getRow(), emptyField.getColumn()];
 		}
