@@ -90,6 +90,7 @@ class Game {
 
 		/* creates tuple of players, to choose current player depending on turn counter */
 		this.playerQueue = [this.xPlayer, this.oPlayer];
+		this.resetCounters();
 
 		/* shows game container */
 		this.gameContainer.classList.remove('hidden');
@@ -112,9 +113,7 @@ class Game {
 
 	restartGame = (): void => {
 		/* reset counters */
-		this.ties = 0;
-		this.turnCount = 0;
-		this.gameCount = 0;
+		this.resetCounters();
 
 		/* reset board */
 		this.gameBoard.clear();
@@ -132,6 +131,12 @@ class Game {
 
 		/* set focus to restart button */
 		this.restartGameButton.focus();
+	};
+
+	resetCounters = (): void => {
+		this.ties = 0;
+		this.turnCount = 0;
+		this.gameCount = 0;
 	};
 
 	getCurrentPlayerMark = (): string => {
@@ -328,7 +333,7 @@ class ResultModal {
 		this.continueButton.addEventListener('click', this.handleContinue);
 	}
 
-	handleContinue = (ev: Event): void => {
+	handleContinue = (): void => {
 		this.gameContinueHandling();
 		this.hide();
 	};
