@@ -1,5 +1,6 @@
 /* types */
 type TripleField = [Field, Field, Field];
+type Coordinates = [number, number];
 /* types end */
 
 /* classes */
@@ -57,7 +58,7 @@ class Game {
 		this.makeMove(row, column);
 	};
 
-	onGameContinue = () => {
+	onGameContinue = (): void => {
 		this.gameCount++;
 		this.turnCount = 0;
 		this.gameBoard.clear();
@@ -247,26 +248,26 @@ class Player {
 }
 
 class CPUPlayer extends Player {
-	makeMove = (board: GameBoard): [number, number] => {
-		const winningPlay: [number, number] = this.getWinningPlay(board);
+	makeMove = (board: GameBoard): Coordinates => {
+		const winningPlay: Coordinates = this.getWinningPlay(board);
 		if (winningPlay !== null) return winningPlay;
 
-		const blockingPlay: [number, number] = this.getBlockingPlay(board);
+		const blockingPlay: Coordinates = this.getBlockingPlay(board);
 		if (blockingPlay !== null) return blockingPlay;
 
 		return this.makeRandomMove(board);
 	};
 
-	getWinningPlay = (board: GameBoard): [number, number] | null => {
+	getWinningPlay = (board: GameBoard): Coordinates | null => {
 		return this.getPlay(board, this.getMark());
 	};
 
-	getBlockingPlay = (board: GameBoard): [number, number] | null => {
+	getBlockingPlay = (board: GameBoard): Coordinates | null => {
 		const compareToMark = this.getMark() === 'o' ? 'x' : 'o';
 		return this.getPlay(board, compareToMark);
 	};
 
-	getPlay = (board: GameBoard, compareToMark: string): [number, number] | null => {
+	getPlay = (board: GameBoard, compareToMark: string): Coordinates | null => {
 		const boardSize: number = board.BOARD_SIZE;
 		/* check rows and columns */
 		for (let rowNumber = 0; rowNumber < boardSize; rowNumber++) {
@@ -352,9 +353,9 @@ class CPUPlayer extends Player {
 		return null;
 	};
 
-	makeRandomMove = (board: GameBoard): [number, number] => {
-		const boardSize = board.BOARD_SIZE;
-		let row, column;
+	makeRandomMove = (board: GameBoard): Coordinates => {
+		const boardSize: number = board.BOARD_SIZE;
+		let row: number, column: number;
 		do {
 			row = Math.floor(Math.random() * boardSize);
 			column = Math.floor(Math.random() * boardSize);
@@ -547,7 +548,7 @@ class Field {
 	};
 
 	/* hover/focus out field handle */
-	handleBlur = () => {
+	handleBlur = (): void => {
 		this.fieldElement.removeAttribute('data-current-player');
 	};
 	/* handlers end */
