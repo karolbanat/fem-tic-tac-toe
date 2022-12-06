@@ -23,10 +23,10 @@ class Game {
 	private gameCount: number = 0;
 	private turnCount: number = 0;
 
-	constructor(gameMenuId: string, gameContainerId: string) {
-		this.gameMenu = new GameMenu(gameMenuId, this.init);
+	constructor() {
+		this.gameMenu = new GameMenu('#game-menu', this.init);
 		this.gameMenu.init();
-		this.gameContainer = document.querySelector(gameContainerId);
+		this.gameContainer = document.querySelector('#tic-tac-toe-game');
 		this.scoreBoard = new ScoreBoard('#score-board');
 		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
 		this.turnIndicator = new TurnIndicator();
@@ -681,5 +681,5 @@ class CPUPlayer extends Player {
 /* classes end */
 
 /* game objects */
-const ticTacToeGame: Game = new Game('#game-menu', '#tic-tac-toe-game');
+const ticTacToeGame: Game = new Game();
 /* game objects end */
