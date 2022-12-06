@@ -11,8 +11,9 @@ class Game {
 	private gameBoard: GameBoard;
 	private scoreBoard: ScoreBoard;
 	private turnIndicator: TurnIndicator;
-	private gameResultModal: ResultModal;
 	private restartGameButton: HTMLButtonElement;
+	/* game modals */
+	private gameResultModal: ResultModal;
 	private restartGameModal: RestartModal;
 	/* players */
 	private xPlayer: Player;
@@ -24,18 +25,30 @@ class Game {
 	private turnCount: number = 0;
 
 	constructor() {
+		/* game menu */
 		this.gameMenu = new GameMenu('#game-menu', this.init);
 		this.gameMenu.init();
+
+		/* container */
 		this.gameContainer = document.querySelector('#tic-tac-toe-game');
-		this.scoreBoard = new ScoreBoard('#score-board');
+
+		/* game board */
 		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
+
+		/* score board and current's player turn */
+		this.scoreBoard = new ScoreBoard('#score-board');
 		this.turnIndicator = new TurnIndicator();
-		this.gameResultModal = new ResultModal(this.onGameQuit, this.onGameContinue);
-		this.restartGameModal = new RestartModal(this.restartGame, this.setResetButtonFocus);
+
+		/* restart button */
 		this.restartGameButton = this.gameContainer.querySelector('#restart-game-button');
 		this.restartGameButton.addEventListener('click', this.onRestartButtonClick);
+
+		/* modals */
+		this.gameResultModal = new ResultModal(this.onGameQuit, this.onGameContinue);
+		this.restartGameModal = new RestartModal(this.restartGame, this.setResetButtonFocus);
 	}
 
+	/* handlers */
 	onFieldClick = (ev: Event): void => {
 		/* retrieve row and column from clicked button and make move */
 		const fieldButton = ev.target as HTMLButtonElement;
@@ -64,6 +77,12 @@ class Game {
 		this.restartGameModal.show();
 	};
 
+	setResetButtonFocus = (): void => {
+		this.restartGameButton.focus();
+	};
+	/* handlers end */
+
+	/* game management */
 	init = (mode: string, p1Mark: string): void => {
 		const p2Mark: string = p1Mark === 'x' ? 'o' : 'x';
 		let p1Label: string, player1: Player;
@@ -134,25 +153,9 @@ class Game {
 		/* set focus to restart button */
 		this.setResetButtonFocus();
 	};
+	/* game management end */
 
-	setResetButtonFocus = (): void => {
-		this.restartGameButton.focus();
-	};
-
-	resetCounters = (): void => {
-		this.ties = 0;
-		this.turnCount = 0;
-		this.gameCount = 0;
-	};
-
-	getCurrentPlayerMark = (): string => {
-		return this.getCurrentPlayer().getMark();
-	};
-
-	getCurrentPlayer = (): Player => {
-		return this.playerQueue[(this.gameCount + this.turnCount) % 2];
-	};
-
+	/* making move related */
 	makeMove = (row: number, column: number): void => {
 		/* on field click, if field is checked then return doing nothing */
 		if (this.gameBoard.isFieldChecked(row, column)) return;
@@ -188,7 +191,31 @@ class Game {
 			this.makeMove(...(this.getCurrentPlayer() as CPUPlayer).makeMove(this.gameBoard));
 		}
 	};
+	/* making move related end */
 
+	/* player states */
+	getCurrentPlayerMark = (): string => {
+		return this.getCurrentPlayer().getMark();
+	};
+
+	getCurrentPlayer = (): Player => {
+		return this.playerQueue[(this.gameCount + this.turnCount) % 2];
+	};
+	/* player states end */
+
+	/* counters management */
+	resetCounters = (): void => {
+		this.ties = 0;
+		this.turnCount = 0;
+		this.gameCount = 0;
+	};
+
+	increaseTurnCount = (): number => {
+		return ++this.turnCount;
+	};
+	/* counters management end */
+
+	/* view updates */
 	updateTurnIndicator = (): void => {
 		this.turnIndicator.update(this.getCurrentPlayerMark());
 	};
@@ -196,12 +223,246 @@ class Game {
 	updateScoreBoard = (): void => {
 		this.scoreBoard.updateScore(this.xPlayer, this.oPlayer, this.ties);
 	};
-
-	increaseTurnCount = (): number => {
-		return ++this.turnCount;
-	};
+	/* view updates end */
 }
 /* Game class end */
+
+/* Player class start */
+class Player {
+	constructor(private name: string, private mark: string, private score: number = 0) {}
+
+	toString = (): string => `${this.mark} (${this.name})`;
+
+	getName = (): string => this.name;
+
+	getMark = (): string => this.mark;
+
+	getScore = (): number => this.score;
+
+	updateScore = (): number => ++this.score;
+
+	resetScore = (): void => {
+		this.score = 0;
+	};
+}
+
+class CPUPlayer extends Player {
+	makeMove = (board: GameBoard): [number, number] => {
+		const boardSize = board.BOARD_SIZE;
+		let row, column;
+		do {
+			row = Math.floor(Math.random() * boardSize);
+			column = Math.floor(Math.random() * boardSize);
+		} while (board.isFieldChecked(row, column));
+		return [row, column];
+	};
+}
+/* Player class end */
+
+/* GameBoard class start */
+class GameBoard {
+	BOARD_SIZE: number = 3;
+	private boardElement: HTMLElement;
+	private board: Field[][];
+
+	constructor(gameBoardId: string, private onFieldClick: (ev: Event) => void, private getCurrentMark: () => string) {
+		this.boardElement = document.querySelector(gameBoardId);
+	}
+
+	/* management */
+	init = (): void => {
+		this.board = [[], [], []];
+		/* gets all board fields */
+		const boardFieldElements: NodeListOf<HTMLButtonElement> = this.boardElement.querySelectorAll('.game-board__field');
+
+		/* creating fields */
+		for (let row = 0; row < this.board.length; row++) {
+			for (let column = 0; column < this.BOARD_SIZE; column++) {
+				this.board[row].push(
+					new Field(
+						row,
+						column,
+						boardFieldElements[column + row * this.BOARD_SIZE],
+						// handles for field(buttons) events
+						this.onFieldClick,
+						this.getCurrentMark
+					)
+				);
+			}
+		}
+	};
+
+	clear = (): void => {
+		for (let row = 0; row < this.board.length; row++) {
+			for (let column = 0; column < this.BOARD_SIZE; column++) {
+				this.board[row][column].clear();
+			}
+		}
+	};
+	/* management end */
+
+	/* checking state */
+	/* checks/marks field on passed position */
+	checkField = (mark: string, row: number, column: number) => {
+		if (row < this.board.length && column < this.board[0].length) {
+			this.board[row][column].check(mark);
+		}
+	};
+
+	isFieldChecked = (row: number, column: number): boolean => {
+		return this.board[row][column].isChecked();
+	};
+
+	isFull = (): boolean => {
+		return this.board.flat().every(field => field.isChecked());
+	};
+	/* checking state end */
+
+	/* winning fields search */
+	getWinningFields = (): TripleField | null => {
+		return this.checkRows() || this.checkColumns() || this.checkDiagonal();
+	};
+
+	checkRows = (): TripleField | null => {
+		for (let row = 0; row < this.BOARD_SIZE; row++) {
+			if (
+				this.board[row][0].getMark() !== null &&
+				this.board[row][0].getMark() === this.board[row][1].getMark() &&
+				this.board[row][1].getMark() === this.board[row][2].getMark()
+			)
+				return [
+					this.board[row][0].setAsGameWinning(),
+					this.board[row][1].setAsGameWinning(),
+					this.board[row][2].setAsGameWinning(),
+				];
+		}
+		return null;
+	};
+
+	checkColumns = (): TripleField | null => {
+		for (let column = 0; column < this.BOARD_SIZE; column++) {
+			if (
+				this.board[0][column].getMark() !== null &&
+				this.board[0][column].getMark() === this.board[1][column].getMark() &&
+				this.board[1][column].getMark() === this.board[2][column].getMark()
+			)
+				return [
+					this.board[0][column].setAsGameWinning(),
+					this.board[1][column].setAsGameWinning(),
+					this.board[2][column].setAsGameWinning(),
+				];
+		}
+		return null;
+	};
+
+	checkDiagonal = (): TripleField | null => {
+		/* top left, middle, and bottom right */
+		if (
+			this.board[1][1].getMark() !== null &&
+			this.board[0][0].getMark() === this.board[1][1].getMark() &&
+			this.board[1][1].getMark() === this.board[2][2].getMark()
+		)
+			return [
+				this.board[0][0].setAsGameWinning(),
+				this.board[1][1].setAsGameWinning(),
+				this.board[2][2].setAsGameWinning(),
+			];
+
+		/* top right, middle, and bottom left */
+		if (
+			this.board[1][1].getMark() !== null &&
+			this.board[0][2].getMark() === this.board[1][1].getMark() &&
+			this.board[1][1].getMark() === this.board[2][0].getMark()
+		)
+			return [
+				this.board[0][2].setAsGameWinning(),
+				this.board[1][1].setAsGameWinning(),
+				this.board[2][0].setAsGameWinning(),
+			];
+
+		/* no fields matched */
+		return null;
+	};
+	/* winning fields search end */
+}
+/* GameBoard class end */
+
+/* Field class start */
+class Field {
+	private mark: string = null;
+
+	constructor(
+		private row: number,
+		private column: number,
+		private fieldElement: HTMLButtonElement,
+		private gameOnClickHandler: (ev: Event) => void,
+		private getCurrentMark: () => string
+	) {
+		if (this.fieldElement) {
+			/* click handling */
+			this.fieldElement.addEventListener('click', this.gameOnClickHandler);
+
+			/* hover/focus in handling */
+			this.fieldElement.addEventListener('mouseover', this.handleHover);
+			this.fieldElement.addEventListener('focusin', this.handleHover);
+
+			/* hover/focus out handling */
+			this.fieldElement.addEventListener('mouseout', this.handleBlur);
+			this.fieldElement.addEventListener('focusout', this.handleBlur);
+
+			/* setting attributes */
+			this.fieldElement.dataset.row = this.row.toString();
+			this.fieldElement.dataset.column = this.column.toString();
+			this.clear();
+		}
+	}
+
+	/* handlers */
+	/* hover/focus in field handle */
+	handleHover = (): void => {
+		const currentPlayerMark = this.getCurrentMark();
+		this.fieldElement.setAttribute('data-current-player', currentPlayerMark);
+	};
+
+	/* hover/focus out field handle */
+	handleBlur = () => {
+		this.fieldElement.removeAttribute('data-current-player');
+	};
+	/* handlers end */
+
+	/* management */
+	clear = (): void => {
+		this.mark = null;
+		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, empty field`);
+		this.fieldElement.removeAttribute('data-game-winning');
+		this.fieldElement.removeAttribute('data-current-player');
+		this.fieldElement.removeAttribute('data-mark');
+	};
+
+	check = (mark: string): void => {
+		this.mark = mark;
+		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, ${this.mark} mark`);
+		this.fieldElement.setAttribute('data-mark', mark);
+	};
+	/* management end */
+
+	/* helpers */
+	isChecked = (): boolean => {
+		return this.mark !== null;
+	};
+
+	setAsGameWinning = (): Field => {
+		this.fieldElement.setAttribute('data-game-winning', '');
+		return this;
+	};
+	/* helpers end */
+
+	/* getters */
+	getMark = (): string => {
+		return this.mark;
+	};
+}
+/* Field class end */
 
 /* GameMenu class start */
 class GameMenu {
@@ -223,6 +484,7 @@ class GameMenu {
 		this.formSubmitButtons.forEach(btn => btn.addEventListener('click', this.handleMenuSubmitButton));
 	};
 
+	/* handlers */
 	handleMenuSubmitButton = (ev: Event): void => {
 		ev.preventDefault();
 		/* shows error if any field wasn't selected */
@@ -246,19 +508,7 @@ class GameMenu {
 		/* and runs game initialization */
 		this.gameInit(gameMode, p1Mark); // method from the parent Game class
 	};
-
-	show = (): void => {
-		this.gameMenu.classList.remove('hidden');
-	};
-
-	hide = (): void => {
-		this.gameMenu.classList.add('hidden');
-	};
-
-	setFocus = (): void => {
-		this.formOptions[0]?.focus();
-	};
-
+	/* handlers end */
 	isAnyOptionSelected = (): boolean => {
 		return Array.from(this.formOptions).some(option => option.checked);
 	};
@@ -268,6 +518,22 @@ class GameMenu {
 			if (option.checked) return option.dataset.mark;
 		}
 		return '';
+	};
+	/* helpers */
+
+	/* view update */
+	show = (): void => {
+		this.gameMenu.classList.remove('hidden');
+	};
+
+	hide = (): void => {
+		this.gameMenu.classList.add('hidden');
+	};
+	/* view update end */
+
+	/* other */
+	setFocus = (): void => {
+		this.formOptions[0]?.focus();
 	};
 }
 /* GameMenu class end */
@@ -343,6 +609,7 @@ class ResultModal {
 		this.continueButton.addEventListener('click', this.handleContinue);
 	}
 
+	/* handlers */
 	handleContinue = (): void => {
 		this.gameContinueHandling();
 		this.hide();
@@ -352,7 +619,9 @@ class ResultModal {
 		this.hide();
 		this.gameQuitHandling();
 	};
+	/* handlers end */
 
+	/* view updates */
 	show = (winner: Player | null = null): void => {
 		this.modal.classList.add('active');
 		this.updateResult(winner);
@@ -409,7 +678,9 @@ class ResultModal {
 		this.modalHeading.appendChild(imgElement);
 		this.modalHeading.appendChild(headingSpan);
 	};
+	/* view updates end */
 
+	/* helpers */
 	getRoundMessage = (playerName: string): string => {
 		let message;
 		switch (playerName) {
@@ -451,6 +722,7 @@ class RestartModal {
 		this.restartButton.addEventListener('click', this.handleRestart);
 	}
 
+	/* handlers */
 	handleCancel = (): void => {
 		this.hide();
 		this.cancelSupport();
@@ -460,7 +732,9 @@ class RestartModal {
 		this.gameRestartHandling();
 		this.hide();
 	};
+	/* handlers end */
 
+	/* view updates */
 	show = (): void => {
 		this.modal.classList.add('active');
 		this.cancelButton.focus();
@@ -469,232 +743,9 @@ class RestartModal {
 	hide = (): void => {
 		this.modal.classList.remove('active');
 	};
+	/* view updates end */
 }
 /* RestartModal class start */
-
-/* GameBoard class start */
-class GameBoard {
-	BOARD_SIZE: number = 3;
-	private boardElement: HTMLElement;
-	private board: Field[][];
-
-	constructor(gameBoardId: string, private onFieldClick: (ev: Event) => void, private getCurrentMark: () => string) {
-		this.boardElement = document.querySelector(gameBoardId);
-	}
-
-	init = (): void => {
-		this.board = [[], [], []];
-		/* gets all board fields */
-		const boardFieldElements: NodeListOf<HTMLButtonElement> = this.boardElement.querySelectorAll('.game-board__field');
-
-		/* creating fields */
-		for (let row = 0; row < this.board.length; row++) {
-			for (let column = 0; column < this.BOARD_SIZE; column++) {
-				this.board[row].push(
-					new Field(
-						row,
-						column,
-						boardFieldElements[column + row * this.BOARD_SIZE],
-						// handles for field(buttons) events
-						this.onFieldClick,
-						this.getCurrentMark
-					)
-				);
-			}
-		}
-	};
-
-	/* checks/marks field on passed position */
-	checkField = (mark: string, row: number, column: number) => {
-		if (row < this.board.length && column < this.board[0].length) {
-			this.board[row][column].check(mark);
-		}
-	};
-
-	isFieldChecked = (row: number, column: number): boolean => {
-		return this.board[row][column].isChecked();
-	};
-
-	isFull = (): boolean => {
-		return this.board.flat().every(field => field.isChecked());
-	};
-
-	getWinningFields = (): TripleField | null => {
-		return this.checkRows() || this.checkColumns() || this.checkDiagonal();
-	};
-
-	checkRows = (): TripleField | null => {
-		for (let row = 0; row < this.BOARD_SIZE; row++) {
-			if (
-				this.board[row][0].getMark() !== null &&
-				this.board[row][0].getMark() === this.board[row][1].getMark() &&
-				this.board[row][1].getMark() === this.board[row][2].getMark()
-			)
-				return [
-					this.board[row][0].setAsGameWinning(),
-					this.board[row][1].setAsGameWinning(),
-					this.board[row][2].setAsGameWinning(),
-				];
-		}
-		return null;
-	};
-
-	checkColumns = (): TripleField | null => {
-		for (let column = 0; column < this.BOARD_SIZE; column++) {
-			if (
-				this.board[0][column].getMark() !== null &&
-				this.board[0][column].getMark() === this.board[1][column].getMark() &&
-				this.board[1][column].getMark() === this.board[2][column].getMark()
-			)
-				return [
-					this.board[0][column].setAsGameWinning(),
-					this.board[1][column].setAsGameWinning(),
-					this.board[2][column].setAsGameWinning(),
-				];
-		}
-		return null;
-	};
-
-	checkDiagonal = (): TripleField | null => {
-		/* top left, middle, and bottom right */
-		if (
-			this.board[1][1].getMark() !== null &&
-			this.board[0][0].getMark() === this.board[1][1].getMark() &&
-			this.board[1][1].getMark() === this.board[2][2].getMark()
-		)
-			return [
-				this.board[0][0].setAsGameWinning(),
-				this.board[1][1].setAsGameWinning(),
-				this.board[2][2].setAsGameWinning(),
-			];
-
-		/* top right, middle, and bottom left */
-		if (
-			this.board[1][1].getMark() !== null &&
-			this.board[0][2].getMark() === this.board[1][1].getMark() &&
-			this.board[1][1].getMark() === this.board[2][0].getMark()
-		)
-			return [
-				this.board[0][2].setAsGameWinning(),
-				this.board[1][1].setAsGameWinning(),
-				this.board[2][0].setAsGameWinning(),
-			];
-
-		/* no fields matched */
-		return null;
-	};
-
-	clear = (): void => {
-		for (let row = 0; row < this.board.length; row++) {
-			for (let column = 0; column < this.BOARD_SIZE; column++) {
-				this.board[row][column].clear();
-			}
-		}
-	};
-}
-/* GameBoard class end */
-
-/* Field class start */
-class Field {
-	private mark: string = null;
-
-	constructor(
-		private row: number,
-		private column: number,
-		private fieldElement: HTMLButtonElement,
-		private gameOnClickHandler: (ev: Event) => void,
-		private getCurrentMark: () => string
-	) {
-		if (this.fieldElement) {
-			/* click handling */
-			this.fieldElement.addEventListener('click', this.gameOnClickHandler);
-
-			/* hover/focus in handling */
-			this.fieldElement.addEventListener('mouseover', this.handleHover);
-			this.fieldElement.addEventListener('focusin', this.handleHover);
-
-			/* hover/focus out handling */
-			this.fieldElement.addEventListener('mouseout', this.handleBlur);
-			this.fieldElement.addEventListener('focusout', this.handleBlur);
-
-			/* setting attributes */
-			this.fieldElement.dataset.row = this.row.toString();
-			this.fieldElement.dataset.column = this.column.toString();
-			this.clear();
-		}
-	}
-
-	/* hover/focus in field handle */
-	handleHover = (): void => {
-		const currentPlayerMark = this.getCurrentMark();
-		this.fieldElement.setAttribute('data-current-player', currentPlayerMark);
-	};
-
-	/* hover/focus out field handle */
-	handleBlur = () => {
-		this.fieldElement.removeAttribute('data-current-player');
-	};
-
-	clear = (): void => {
-		this.mark = null;
-		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, empty field`);
-		this.fieldElement.removeAttribute('data-game-winning');
-		this.fieldElement.removeAttribute('data-current-player');
-		this.fieldElement.removeAttribute('data-mark');
-	};
-
-	check = (mark: string): void => {
-		this.mark = mark;
-		this.fieldElement.setAttribute('aria-label', `Row ${this.row + 1}, column ${this.column + 1}, ${this.mark} mark`);
-		this.fieldElement.setAttribute('data-mark', mark);
-	};
-
-	isChecked = (): boolean => {
-		return this.mark !== null;
-	};
-
-	setAsGameWinning = (): Field => {
-		this.fieldElement.setAttribute('data-game-winning', '');
-		return this;
-	};
-
-	getMark = (): string => {
-		return this.mark;
-	};
-}
-/* Field class end */
-
-/* Player class start */
-class Player {
-	constructor(private name: string, private mark: string, private score: number = 0) {}
-
-	toString = (): string => `${this.mark} (${this.name})`;
-
-	getName = (): string => this.name;
-
-	getMark = (): string => this.mark;
-
-	getScore = (): number => this.score;
-
-	updateScore = (): number => ++this.score;
-
-	resetScore = (): void => {
-		this.score = 0;
-	};
-}
-
-class CPUPlayer extends Player {
-	makeMove = (board: GameBoard): [number, number] => {
-		const boardSize = board.BOARD_SIZE;
-		let row, column;
-		do {
-			row = Math.floor(Math.random() * boardSize);
-			column = Math.floor(Math.random() * boardSize);
-		} while (board.isFieldChecked(row, column));
-		return [row, column];
-	};
-}
-/* Player class end */
 /* classes end */
 
 /* game objects */
