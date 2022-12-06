@@ -31,7 +31,7 @@ class Game {
 		this.gameBoard = new GameBoard('#game-board', this.onFieldClick, this.getCurrentPlayerMark);
 		this.turnIndicator = new TurnIndicator();
 		this.gameResultModal = new ResultModal(this.onGameQuit, this.onGameContinue);
-		this.restartGameModal = new RestartModal(this.restartGame);
+		this.restartGameModal = new RestartModal(this.restartGame, this.setResetButtonFocus);
 		this.restartGameButton = this.gameContainer.querySelector('#restart-game-button');
 		this.restartGameButton.addEventListener('click', this.onRestartButtonClick);
 	}
@@ -48,6 +48,7 @@ class Game {
 		this.gameCount++;
 		this.turnCount = 0;
 		this.gameBoard.clear();
+		this.setResetButtonFocus();
 		this.updateScoreBoard();
 		this.makeMoveCPU();
 	};
@@ -56,9 +57,10 @@ class Game {
 		this.gameContainer.classList.add('hidden');
 		this.gameBoard.clear();
 		this.gameMenu.show();
+		this.gameMenu.setFocus();
 	};
 
-	onRestartButtonClick = (ev: Event): void => {
+	onRestartButtonClick = (): void => {
 		this.restartGameModal.show();
 	};
 
@@ -130,6 +132,10 @@ class Game {
 		this.makeMoveCPU();
 
 		/* set focus to restart button */
+		this.setResetButtonFocus();
+	};
+
+	setResetButtonFocus = (): void => {
 		this.restartGameButton.focus();
 	};
 
@@ -247,6 +253,10 @@ class GameMenu {
 
 	hide = (): void => {
 		this.gameMenu.classList.add('hidden');
+	};
+
+	setFocus = (): void => {
+		this.formOptions[0]?.focus();
 	};
 
 	isAnyOptionSelected = (): boolean => {
@@ -429,7 +439,7 @@ class RestartModal {
 	private cancelButton: HTMLButtonElement;
 	private restartButton: HTMLButtonElement;
 
-	constructor(private gameRestartHandling: () => void) {
+	constructor(private gameRestartHandling: () => void, private cancelSupport: () => void) {
 		this.modal = document.querySelector('#game-reset-modal');
 
 		/* cancel button */
@@ -443,6 +453,7 @@ class RestartModal {
 
 	handleCancel = (): void => {
 		this.hide();
+		this.cancelSupport();
 	};
 
 	handleRestart = (): void => {
@@ -452,6 +463,7 @@ class RestartModal {
 
 	show = (): void => {
 		this.modal.classList.add('active');
+		this.cancelButton.focus();
 	};
 
 	hide = (): void => {
