@@ -4,8 +4,8 @@ This is a solution to the [Tic Tac Toe challenge on Frontend Mentor](https://www
 
 ## Links
 
-- Solution URL: [FrontEnd Mentor Solution Page](https://your-solution-url.com)
-- Live Site URL: [GitHub Pages Site](https://your-live-site-url.com)
+- Solution URL: [FrontEnd Mentor Solution Page](https://www.frontendmentor.io/solutions/tic-tac-toe-game-Nxfq5bGFhF)
+- Live Site URL: [GitHub Pages Site](https://karolbanat.github.io/fem-tic-tac-toe/)
 
 ## Author
 
