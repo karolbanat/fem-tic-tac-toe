@@ -248,6 +248,103 @@ class Player {
 
 class CPUPlayer extends Player {
 	makeMove = (board: GameBoard): [number, number] => {
+		const winningPlay: [number, number] = this.getWinningPlay(board);
+		if (winningPlay !== null) return winningPlay;
+
+		const blockingPlay: [number, number] = this.getBlockingPlay(board);
+		if (blockingPlay !== null) return blockingPlay;
+
+		return this.makeRandomMove(board);
+	};
+
+	getWinningPlay = (board: GameBoard): [number, number] | null => {
+		return this.getPlay(board, this.getMark());
+	};
+
+	getBlockingPlay = (board: GameBoard): [number, number] | null => {
+		const compareToMark = this.getMark() === 'o' ? 'x' : 'o';
+		return this.getPlay(board, compareToMark);
+	};
+
+	getPlay = (board: GameBoard, compareToMark: string): [number, number] | null => {
+		const boardSize: number = board.BOARD_SIZE;
+		/* check rows */
+		for (let rowNumber = 0; rowNumber < boardSize; rowNumber++) {
+			const fieldsRow: TripleField = board.getRow(rowNumber);
+			let sameMarkCount: number = 0;
+			let emptyFieldCount: number = 0;
+			let emptyField: Field;
+			for (const field of fieldsRow) {
+				if (field.getMark() === compareToMark) sameMarkCount++;
+				if (field.getMark() === null) {
+					emptyFieldCount++;
+					emptyField = field;
+				}
+			}
+
+			if (sameMarkCount === 2 && emptyFieldCount === 1) {
+				return [emptyField.getRow(), emptyField.getColumn()];
+			}
+		}
+
+		/* check columns */
+		for (let colNumber = 0; colNumber < boardSize; colNumber++) {
+			const fieldsRow: TripleField = board.getColumn(colNumber);
+			let sameMarkCount: number = 0;
+			let emptyFieldCount: number = 0;
+			let emptyField: Field;
+			for (const field of fieldsRow) {
+				if (field.getMark() === compareToMark) sameMarkCount++;
+				if (field.getMark() === null) {
+					emptyFieldCount++;
+					emptyField = field;
+				}
+			}
+
+			if (sameMarkCount === 2 && emptyFieldCount === 1) {
+				return [emptyField.getRow(), emptyField.getColumn()];
+			}
+		}
+
+		/* check diagonals */
+		// left top to bottom right
+		const leftTopDiagonal: TripleField = board.getLeftTopDiagonal();
+		let sameMarkCount: number = 0;
+		let emptyFieldCount: number = 0;
+		let emptyField: Field;
+		for (const field of leftTopDiagonal) {
+			if (field.getMark() === compareToMark) sameMarkCount++;
+			if (field.getMark() === null) {
+				emptyFieldCount++;
+				emptyField = field;
+			}
+		}
+
+		if (sameMarkCount === 2 && emptyFieldCount === 1) {
+			return [emptyField.getRow(), emptyField.getColumn()];
+		}
+
+		// right top to bottom left
+		const rightTopDiagonal: TripleField = board.getRightTopDiagonal();
+		sameMarkCount = 0;
+		emptyFieldCount = 0;
+		emptyField = null;
+		for (const field of rightTopDiagonal) {
+			if (field.getMark() === compareToMark) sameMarkCount++;
+			if (field.getMark() === null) {
+				emptyFieldCount++;
+				emptyField = field;
+			}
+		}
+
+		if (sameMarkCount === 2 && emptyFieldCount === 1) {
+			return [emptyField.getRow(), emptyField.getColumn()];
+		}
+
+		return null;
+	};
+
+	makeRandomMove = (board: GameBoard): [number, number] => {
 		const boardSize = board.BOARD_SIZE;
 		let row, column;
 		do {
@@ -384,6 +481,23 @@ class GameBoard {
 		return null;
 	};
 	/* winning fields search end */
+
+	/* accessors */
+	getRow = (rowNumber: number): TripleField => {
+		return [this.board[rowNumber][0], this.board[rowNumber][1], this.board[rowNumber][2]];
+	};
+
+	getColumn = (columnNumber: number): TripleField => {
+		return [this.board[0][columnNumber], this.board[1][columnNumber], this.board[2][columnNumber]];
+	};
+
+	getLeftTopDiagonal = (): TripleField => {
+		return [this.board[0][0], this.board[1][1], this.board[2][2]];
+	};
+
+	getRightTopDiagonal = (): TripleField => {
+		return [this.board[0][2], this.board[1][1], this.board[2][0]];
+	};
 }
 /* GameBoard class end */
 
@@ -458,9 +572,13 @@ class Field {
 	/* helpers end */
 
 	/* getters */
-	getMark = (): string => {
+	getMark = (): string | null => {
 		return this.mark;
 	};
+
+	getRow = (): number => this.row;
+
+	getColumn = (): number => this.column;
 }
 /* Field class end */
 
